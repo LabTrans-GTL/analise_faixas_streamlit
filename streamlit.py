@@ -1081,7 +1081,7 @@ with tab1:
                     # Nova seção: Tabela de Passageiros por Aeronave (Pivot)
                     st.markdown("---")
                     st.markdown("#### 👥 **Tabela de Passageiros (E + D) por Aeronave**")
-                    st.markdown(f"*Tabela pivot mostrando passageiros (E + D) por aeronave e período na **{faixa_selecionada_voos}***")
+                    st.markdown(f"*Matriz mostrando passageiros (E + D) por aeronave e período na **{faixa_selecionada_voos}***")
         
                     
                     # Usar passageiros reais do DataFrame
@@ -1122,7 +1122,7 @@ with tab1:
                         
                         
                         # Tabela pivot de passageiros
-                        st.markdown("#### 📋 **Tabela Pivot: Passageiros (E + D) por Aeronave e Período**")
+                        st.markdown("#### 📋 **Matriz: Passageiros (E + D) por Aeronave e Período**")
                         
                         # Resetar index para mostrar período como coluna
                         df_tabela_passageiros = df_pivot_passageiros.reset_index()
