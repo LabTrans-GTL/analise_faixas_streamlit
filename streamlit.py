@@ -106,9 +106,14 @@ def obter_cor_aeronave(aeronave, todas_aeronaves):
 
 @st.cache_data
 def carregar_dados():
-    aeroporto_pax = pl.read_parquet("faixas_aeroportos.parquet")
+    aeroporto_pax = pl.read_parquet("faixas_aeroportos.parquet").with_columns(
+        pl.col("ano").cast(pl.Int64)
+    )
 
-    voos_aeroporto_aeronave = pl.read_parquet("voos_por_aeronave_aeroporto_trimestre3.parquet")
+    voos_aeroporto_aeronave = pl.read_parquet("voos_por_aeronave_aeroporto_trimestre3.parquet").with_columns(
+        pl.col("ano").cast(pl.Int64),
+        pl.col("trimestre").cast(pl.Int64)
+    )
 
     faixas_padrao = {
     'bins': [0, 2000, 30000, 50000, 200000, 500000, 1000000, 2000000, 5000000, 10000000, 15000000, float('inf')],
