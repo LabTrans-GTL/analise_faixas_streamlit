@@ -7,6 +7,8 @@ import locale
 import pandas as pd
 
 
+# ----------------------------------------------------------
+
 # Função para formatar números com separador de milhares usando ponto
 def formatar_numero(numero, casas_decimais=0):
     """
