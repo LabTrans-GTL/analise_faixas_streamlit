@@ -42,6 +42,31 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- LOGIN ---
+def login():
+    st.title("Análise de Faixas de Aeroportos PAN - Login")
+    with st.form("login_form"):
+        username = st.text_input("Usuário")
+        password = st.text_input("Senha", type="password")
+        submitted = st.form_submit_button("Entrar")
+
+        if submitted:
+            correct_username = st.secrets["credentials"]["username"]
+            correct_password = st.secrets["credentials"]["password"]
+            
+            if username == correct_username and password == correct_password:
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("Usuário ou senha inválidos")
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    login()
+    st.stop()
+
 # Função para gerar cores consistentes para aeronaves
 @st.cache_data
 def gerar_paleta_cores_aeronaves():
