@@ -115,6 +115,26 @@ def carregar_dados():
         pl.col("trimestre").cast(pl.Int64)
     )
 
+    # Calcular o total de passageiros (pax) do DW por aeroporto e ano
+    pax_dw = (voos_aeroporto_aeronave
+              .group_by(["aeroporto", "ano"])
+              .agg(pl.sum("pax").alias("passageiros_dw")))
+
+    # Juntar os dados de pax do DW com o DataFrame principal de aeroportos
+    aeroporto_pax = aeroporto_pax.join(pax_dw, on=["aeroporto", "ano"], how="left")
+
+    # Atualizar a coluna de passageiros:
+    # - Usar 'passageiros_dw' para anos < 2025. Se for nulo (sem voos), será 0.
+    # - Manter 'passageiros_projetado' para 2025
+    aeroporto_pax = aeroporto_pax.with_columns(
+        pl.when(pl.col("ano") < 2025)
+        .then(pl.col("passageiros_dw"))
+        .otherwise(pl.col("passageiros_projetado"))
+        .alias("passageiros_atualizado")
+    ).drop("passageiros_projetado", "passageiros_dw").rename({"passageiros_atualizado": "passageiros_projetado"}).with_columns(
+        pl.col("passageiros_projetado").fill_null(0) # Preencher nulos com 0
+    )
+
     faixas_padrao = {
     'bins': [0, 2000, 30000, 50000, 200000, 500000, 1000000, 2000000, 5000000, 10000000, 15000000, float('inf')],
     'labels': ['Faixa_AvG', 'Faixa_1', 'Faixa_2', 'Faixa_3', 'Faixa_4', 'Faixa_5', 'Faixa_6', 'Faixa_7', 'Faixa_8', 'Faixa_9', 'Faixa_10']
