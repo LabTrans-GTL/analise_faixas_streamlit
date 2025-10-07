@@ -152,12 +152,24 @@ if 'anos_exclusao' not in st.session_state:
 
 st.sidebar.markdown("### 🚫 **Exclusão de Aeroportos**")
 
+# Definir a lista de aeroportos padrão para exclusão
+aeroportos_padrao_exclusao = [
+    'SBGV', 'SBIL', 'SBJV', 'SBKG', 'SBME', 'SBML', 'SBPB', 'SBPP', 'SBRJ', 
+    'SBRP', 'SBSM', 'SBSP', 'SBSR', 'SBTC', 'SBTE', 'SBUA', 'SBUG', 'SBUR', 
+    'SBUY', 'SIRI', 'SISO', 'SNCL', 'SNRJ', 'SNTI', 'SSCT', 'SSUV', 'SWCA', 
+    'SBJR', 'SBMI', 'SBCO'
+]
+
+# Botão para selecionar os padrões
+if st.sidebar.button("Selecionar Exclusões Padrão"):
+    st.session_state['aeroportos_excluidos'] = aeroportos_padrao_exclusao
+
 # Seletor de aeroportos para exclusão
 aeroportos_excluidos = st.sidebar.multiselect(
     "Selecione o Aeroporto a ser excluído:",
     options=aeroporto_pax["aeroporto"].unique().sort(),
     key='aeroportos_excluidos',
-    help="Selecione os aeroportos que deseja excluir da análise"
+    help="Selecione os aeroportos que deseja excluir da análise ou clique no botão para selecionar o padrão"
 )
 
 # Seletor de anos para exclusão (apenas se houver aeroportos selecionados)
@@ -479,71 +491,16 @@ with tab1:
     # Controles de filtro por ano para o gráfico principal
     st.markdown("#### 🔍 **Distribuição de Aeroportos por Faixa**")
 
-    col_grafico1, col_grafico2 = st.columns([1, 2])
-
-    with col_grafico1:
-        # Opção para ver todos os anos ou filtrar por ano específico no gráfico
-        modo_grafico = st.radio(
-            "📅 **Visualização do Gráfico:**",
-            options=["Todos os Anos", "Por Ano Específico"],
-            index=0,
-            help="Escolha se o gráfico deve mostrar dados consolidados ou de um ano específico",
-            key="modo_grafico"
-        )
-
-    with col_grafico2:
-        if modo_grafico == "Por Ano Específico":
-            # Seletor de ano específico para o gráfico
-            anos_disponiveis_grafico = sorted(df_com_faixas["ano"].unique().to_list())
-            ano_selecionado_grafico = st.selectbox(
-                "🗓️ **Ano para o Gráfico:**",
-                options=anos_disponiveis_grafico,
-                index=len(anos_disponiveis_grafico)-1,  # Último ano por padrão
-                help="Selecione o ano para visualização no gráfico",
-                key="ano_grafico"
-            )
-        else:
-            st.info("📊 **Gráfico mostrando dados consolidados de todos os anos**")
-
-    # Calcular distribuição baseada no modo selecionado para o gráfico
-    if modo_grafico == "Por Ano Específico":
-        # Filtrar dados por ano específico para o gráfico
-        df_grafico_filtrado = df_com_faixas.filter(pl.col("ano") == ano_selecionado_grafico)
-        
-        distribuicao_faixas = (df_grafico_filtrado
-                              .group_by("faixa_personalizada")
-                              .agg([
-                                  pl.count("aeroporto").alias("quantidade_aeroportos"),
-                                  pl.mean("passageiros_projetado").alias("media_passageiros")
-                              ])
-                              .sort("faixa_personalizada"))
-        
-        # Mostrar métricas do ano selecionado para o gráfico
-        total_aeroportos_grafico = df_grafico_filtrado["aeroporto"].n_unique()
-        total_passageiros_grafico = df_grafico_filtrado["passageiros_projetado"].sum()
-        
-        col_metric_grafico1, col_metric_grafico2, col_metric_grafico3 = st.columns(3)
-        with col_metric_grafico1:
-            st.metric(f"Aeroportos em {ano_selecionado_grafico}", formatar_numero(total_aeroportos_grafico))
-        with col_metric_grafico2:
-            st.metric(f"Total Passageiros (E + D) {ano_selecionado_grafico}", formatar_numero(total_passageiros_grafico))
-        with col_metric_grafico3:
-            media_ano = df_grafico_filtrado["passageiros_projetado"].mean()
-            st.metric(f"Média {ano_selecionado_grafico}", formatar_numero(media_ano))
-        
-        titulo_grafico = f"📈 **Distribuição por Faixa - Ano {ano_selecionado_grafico}**"
-        
-    else:
-        # Usar dados consolidados (todos os anos) - mostrar por ano e faixa
-        distribuicao_faixas = (df_com_faixas
-                              .group_by(["faixa_personalizada", "ano"])
-                              .agg([
-                                  pl.count("aeroporto").alias("quantidade_aeroportos"),
-                                  pl.mean("passageiros_projetado").alias("media_passageiros")
-                              ])
-                              .sort(["faixa_personalizada", "ano"]))
-        
-        titulo_grafico = "📊 **Distribuição por Faixa - Comparação entre Anos**"
+    # Usar dados consolidados (todos os anos) - mostrar por ano e faixa
+    distribuicao_faixas = (df_com_faixas
+                          .group_by(["faixa_personalizada", "ano"])
+                          .agg([
+                              pl.count("aeroporto").alias("quantidade_aeroportos"),
+                              pl.mean("passageiros_projetado").alias("media_passageiros")
+                          ])
+                          .sort(["faixa_personalizada", "ano"]))
+    
+    titulo_grafico = "📊 **Distribuição por Faixa - Comparação entre Anos**"
 
     # Mostrar gráfico principal
     st.markdown(titulo_grafico)
@@ -551,75 +508,67 @@ with tab1:
 
     # Verificar se há dados para mostrar
     if len(chart_data) > 0:
-        if modo_grafico == "Todos os Anos":
-            # Criar gráfico de barras agrupadas para comparação entre anos
-            # Criar pivot table para o gráfico
-            df_pivot_anos = chart_data.pivot(index='faixa_personalizada', columns='ano', values='quantidade_aeroportos').fillna(0)
-            
-            # Ordenar as faixas na ordem correta: Faixa_AvG, Faixa_1, Faixa_2, ..., Faixa_10
-            def ordenar_faixas(faixa):
-                if faixa == 'Faixa_AvG':
-                    return (0, 'AvG')
-                else:
-                    # Extrair número da faixa (ex: 'Faixa_5' -> 5)
-                    numero = int(faixa.split('_')[1])
-                    return (1, numero)
-            
-            # Aplicar ordenação personalizada
-            faixas_ordenadas = sorted(df_pivot_anos.index, key=ordenar_faixas)
-            df_pivot_anos = df_pivot_anos.reindex(faixas_ordenadas)
-            
-            # Criar gráfico Plotly para barras agrupadas
-            fig_anos = go.Figure()
-            
-            # Adicionar uma série de barras para cada ano
-            anos_disponiveis = sorted(df_pivot_anos.columns)
-            cores_anos = px.colors.qualitative.Set3[:len(anos_disponiveis)]  # Cores distintas para cada ano
-            
-            for i, ano in enumerate(anos_disponiveis):
-                fig_anos.add_trace(go.Bar(
-                    x=df_pivot_anos.index,
-                    y=df_pivot_anos[ano],
-                    name=f'Ano {ano}',
-                    marker_color=cores_anos[i],
-                                hovertemplate=f'<b>Ano {ano}</b><br>' +
-                                'Faixa: %{x}<br>' +
-                                'Aeroportos: %{y}<br>' +
-                                '<extra></extra>'
-                ))
-            
-            # Configurar layout do gráfico
-            fig_anos.update_layout(
-                title="Distribuição de Aeroportos por Faixa - Comparação entre Anos",
-                xaxis_title="Faixas de Aeroportos",
-                yaxis_title="Quantidade de Aeroportos",
-                height=500,
-                barmode='group',  # Barras agrupadas
-                hovermode='x unified',
-                legend=dict(
-                    orientation="h",
-                    yanchor="bottom",
-                    y=1.02,
-                    xanchor="right",
-                    x=1
-                )
+        # Criar gráfico de barras agrupadas para comparação entre anos
+        # Criar pivot table para o gráfico
+        df_pivot_anos = chart_data.pivot(index='faixa_personalizada', columns='ano', values='quantidade_aeroportos').fillna(0)
+        
+        # Ordenar as faixas na ordem correta: Faixa_AvG, Faixa_1, Faixa_2, ..., Faixa_10
+        def ordenar_faixas(faixa):
+            if faixa == 'Faixa_AvG':
+                return (0, 'AvG')
+            else:
+                # Extrair número da faixa (ex: 'Faixa_5' -> 5)
+                numero = int(faixa.split('_')[1])
+                return (1, numero)
+        
+        # Aplicar ordenação personalizada
+        faixas_ordenadas = sorted(df_pivot_anos.index, key=ordenar_faixas)
+        df_pivot_anos = df_pivot_anos.reindex(faixas_ordenadas)
+        
+        # Criar gráfico Plotly para barras agrupadas
+        fig_anos = go.Figure()
+        
+        # Adicionar uma série de barras para cada ano
+        anos_disponiveis = sorted(df_pivot_anos.columns)
+        cores_anos = px.colors.qualitative.Set3[:len(anos_disponiveis)]  # Cores distintas para cada ano
+        
+        for i, ano in enumerate(anos_disponiveis):
+            fig_anos.add_trace(go.Bar(
+                x=df_pivot_anos.index,
+                y=df_pivot_anos[ano],
+                name=f'Ano {ano}',
+                marker_color=cores_anos[i],
+                            hovertemplate=f'<b>Ano {ano}</b><br>' +
+                            'Faixa: %{x}<br>' +
+                            'Aeroportos: %{y}<br>' +
+                            '<extra></extra>'
+            ))
+        
+        # Configurar layout do gráfico
+        fig_anos.update_layout(
+            title="Distribuição de Aeroportos por Faixa - Comparação entre Anos",
+            xaxis_title="Faixas de Aeroportos",
+            yaxis_title="Quantidade de Aeroportos",
+            height=500,
+            barmode='group',  # Barras agrupadas
+            hovermode='x unified',
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
             )
-            
-            # Melhorar aparência do eixo X
-            fig_anos.update_xaxes(tickangle=45)
-            
-            # Mostrar gráfico
-            st.plotly_chart(fig_anos, use_container_width=True)
-            
-        else:
-            # Gráfico simples para ano específico
-            st.bar_chart(
-                chart_data.set_index("faixa_personalizada")["quantidade_aeroportos"],
-                use_container_width=True,
-                height=400
-            )
+        )
+        
+        # Melhorar aparência do eixo X
+        fig_anos.update_xaxes(tickangle=45)
+        
+        # Mostrar gráfico
+        st.plotly_chart(fig_anos, use_container_width=True)
+        
     else:
-        st.warning(f"⚠️ Nenhum dado encontrado para o ano {ano_selecionado_grafico if modo_grafico == 'Por Ano Específico' else 'selecionado'}.")
+        st.warning("⚠️ Nenhum dado encontrado para o período selecionado.")
 
     # Tabela resumo compacta
     st.markdown("---")
@@ -640,7 +589,8 @@ with tab1:
         # Filtrar dados por ano específico selecionado
         df_filtrado_ano = df_com_faixas.filter(pl.col("ano") == ano_selecionado)
         
-        distribuicao_por_ano = (df_filtrado_ano
+        # Agregar dados
+        distribuicao_por_ano_agg = (df_filtrado_ano
                                .group_by("faixa_personalizada")
                                .agg([
                                    pl.count("aeroporto").alias("quantidade_aeroportos"),
@@ -648,8 +598,23 @@ with tab1:
                                    pl.sum("passageiros_projetado").alias("total_passageiros"),
                                    pl.min("passageiros_projetado").alias("min_passageiros"),
                                    pl.max("passageiros_projetado").alias("max_passageiros")
-                               ])
-                               .sort("faixa_personalizada"))
+                               ]))
+        
+        # Adicionar chaves de ordenação e ordenar
+        distribuicao_por_ano = (distribuicao_por_ano_agg
+                               .with_columns(
+                                   pl.when(pl.col("faixa_personalizada") == "Faixa_AvG")
+                                   .then(0)
+                                   .otherwise(1).alias("sort_key_prefix"),
+                                   
+                                   pl.when(pl.col("faixa_personalizada") == "Faixa_AvG")
+                                   .then(0)
+                                   .otherwise(
+                                       pl.col("faixa_personalizada").str.extract(r"(\d+)", 1).cast(pl.Int64)
+                                   ).alias("sort_key_num")
+                               )
+                               .sort(["sort_key_prefix", "sort_key_num"])
+                               .drop(["sort_key_prefix", "sort_key_num"]))
         
         st.markdown(f"### 📈 **Distribuição para o Ano {ano_selecionado}**")
         
