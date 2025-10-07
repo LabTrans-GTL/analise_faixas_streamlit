@@ -354,7 +354,7 @@ with tab1:
                             # Determinar valores para este slider
                             if faixa_idx == 0:
                                 # Primeira faixa (AvG → 1)
-                                min_val = 1000
+                                min_val = 100
                                 max_val = 50000
                                 default_val = valores_padrao_base[faixa_idx]
                                 step = 100
@@ -362,18 +362,18 @@ with tab1:
                                 help_text = "Pax (E + D) até este valor serão classificados como Faixa AvG"
                             else:
                                 # Faixas subsequentes
-                                min_val = faixas_personalizadas[faixa_idx-1] + (1000 if faixa_idx < 3 else 10000 if faixa_idx < 6 else 50000)
+                                min_val = faixas_personalizadas[faixa_idx-1] + (100 if faixa_idx < 3 else 1000 if faixa_idx < 6 else 5000)
                                 
                                 # Determinar max_val baseado na posição da faixa
                                 if faixa_idx < 3:
                                     max_val = 500000
-                                    step = 1000
+                                    step = 100
                                 elif faixa_idx < 6:
                                     max_val = 5000000
-                                    step = 10000
+                                    step = 1000
                                 else:
                                     max_val = 25000000
-                                    step = 100000
+                                    step = 10000
                                 
                                 default_val = max(valores_padrao_base[faixa_idx] if faixa_idx < len(valores_padrao_base) else min_val + step, min_val)
                                 label = f"{cores_icones[faixa_idx]} Limite Faixa {faixa_idx} → Faixa {faixa_idx + 1}"
