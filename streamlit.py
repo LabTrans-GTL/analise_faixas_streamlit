@@ -382,7 +382,21 @@ with tab1:
                                 help_text = "Pax (E + D) até este valor serão classificados como Faixa AvG"
                             else:
                                 # Faixas subsequentes
-                                min_val = faixas_personalizadas[faixa_idx-1] + (100 if faixa_idx < 3 else 1000 if faixa_idx < 6 else 5000)
+                                if faixa_idx == 4:
+                                    incremento = 300_000
+                                elif faixa_idx == 5:
+                                    incremento = 500_000
+                                elif faixa_idx == 6:
+                                    incremento = 1_000_000
+                                elif faixa_idx == 7:
+                                    incremento = 3_000_000
+                                elif faixa_idx == 8 or faixa_idx == 9:
+                                    incremento = 5_000_000
+                                elif faixa_idx <= 3:
+                                    incremento = 100
+                                else:
+                                    incremento = 5000
+                                min_val = faixas_personalizadas[faixa_idx-1] + incremento
                                 
                                 # Determinar max_val baseado na posição da faixa
                                 if faixa_idx < 3:
