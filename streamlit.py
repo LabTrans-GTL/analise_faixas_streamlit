@@ -701,7 +701,21 @@ with tab1:
         
         with col_explore1:
             # Seletor de faixa para ver detalhes - usar faixas únicas do DataFrame principal
-            faixas_disponiveis = sorted(df_com_faixas["faixa_personalizada"].unique().to_list())
+            faixas_disponiveis = df_com_faixas["faixa_personalizada"].unique().to_list()
+            
+            # Ordenar faixas na ordem correta: Faixa_AvG, Faixa_1, Faixa_2, ..., Faixa_10
+            def ordenar_faixas_explore(faixa):
+                if faixa == 'Faixa_AvG':
+                    return (0, 'AvG')
+                else:
+                    try:
+                        numero = int(faixa.split('_')[1])
+                        return (1, numero)
+                    except (ValueError, IndexError):
+                        return (2, faixa)
+            
+            faixas_disponiveis = sorted(faixas_disponiveis, key=ordenar_faixas_explore)
+            
             faixa_selecionada = st.selectbox(
                 "📊 **Selecione a Faixa:**",
                 options=faixas_disponiveis,
@@ -837,7 +851,21 @@ with tab1:
         
         with col_voos1:
             # Seletor de faixa para filtrar os aeroportos - usar faixas únicas
-            faixas_disponiveis_voos = sorted(df_com_faixas["faixa_personalizada"].unique().to_list())
+            faixas_disponiveis_voos = df_com_faixas["faixa_personalizada"].unique().to_list()
+            
+            # Ordenar faixas na ordem correta: Faixa_AvG, Faixa_1, Faixa_2, ..., Faixa_10
+            def ordenar_faixas(faixa):
+                if faixa == 'Faixa_AvG':
+                    return (0, 'AvG')
+                else:
+                    try:
+                        numero = int(faixa.split('_')[1])
+                        return (1, numero)
+                    except (ValueError, IndexError):
+                        return (2, faixa)
+            
+            faixas_disponiveis_voos = sorted(faixas_disponiveis_voos, key=ordenar_faixas)
+            
             faixa_selecionada_voos = st.selectbox(
                 "📊 **Selecione a Faixa para Análise:**",
                 options=faixas_disponiveis_voos,
@@ -1417,7 +1445,21 @@ with tab1:
         
         with col_perc1:
             # Seletor de faixa para análise de percentual - usar faixas únicas
-            faixas_disponiveis_perc = sorted(df_com_faixas["faixa_personalizada"].unique().to_list())
+            faixas_disponiveis_perc = df_com_faixas["faixa_personalizada"].unique().to_list()
+            
+            # Ordenar faixas na ordem correta: Faixa_AvG, Faixa_1, Faixa_2, ..., Faixa_10
+            def ordenar_faixas_perc(faixa):
+                if faixa == 'Faixa_AvG':
+                    return (0, 'AvG')
+                else:
+                    try:
+                        numero = int(faixa.split('_')[1])
+                        return (1, numero)
+                    except (ValueError, IndexError):
+                        return (2, faixa)
+            
+            faixas_disponiveis_perc = sorted(faixas_disponiveis_perc, key=ordenar_faixas_perc)
+            
             faixa_selecionada_perc = st.selectbox(
                 "📊 **Selecione a Faixa para Análise:**",
                 options=faixas_disponiveis_perc,
