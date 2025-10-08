@@ -383,15 +383,15 @@ with tab1:
                             else:
                                 # Faixas subsequentes
                                 if faixa_idx == 4:
-                                    incremento = 300_000
+                                    incremento = 300_00
                                 elif faixa_idx == 5:
-                                    incremento = 500_000
+                                    incremento = 500_00
                                 elif faixa_idx == 6:
-                                    incremento = 1_000_000
+                                    incremento = 1_000_00
                                 elif faixa_idx == 7:
-                                    incremento = 3_000_000
+                                    incremento = 3_000_00
                                 elif faixa_idx == 8 or faixa_idx == 9:
-                                    incremento = 5_000_000
+                                    incremento = 5_000_00
                                 elif faixa_idx <= 3:
                                     incremento = 100
                                 else:
