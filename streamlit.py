@@ -1067,7 +1067,6 @@ with tab1:
                             df_tabela_voos[col] = df_tabela_voos[col].apply(lambda x: formatar_numero(x, casas_decimais=0))
                         
                         st.markdown(f"#### 📋 **Dados Detalhados - {faixa_selecionada_voos}**")
-                        st.info(f"💡 **Filtro aplicado:** Faixa {faixa_selecionada_voos} (mesmo filtro do gráfico de evolução)")
                         
                         st.dataframe(
                             df_tabela_voos,
