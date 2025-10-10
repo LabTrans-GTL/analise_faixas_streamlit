@@ -2348,56 +2348,78 @@ with tab3:
             # Nova tabela: Meses Consecutivos
             st.markdown("---")
             st.markdown("#### 📅 **Tabela de Meses Consecutivos**")
-            st.markdown("### Quantidade máxima de meses consecutivos com movimentação por aeroporto e aeronave")
+            st.markdown("### Análise de meses consecutivos (máximo, mínimo e médio) com movimentação por aeroporto e aeronave")
             
             # Calcular meses consecutivos para cada combinação aeroporto-aeronave
             def calcular_meses_consecutivos(row, periodos_unicos):
-                """Calcula o máximo de meses consecutivos com movimento"""
+                """Calcula máximo, mínimo e médio de meses consecutivos com movimento"""
                 max_consecutivos = 0
+                min_consecutivos = float('inf')
                 consecutivos_atual = 0
+                sequencias = []  # Lista para armazenar todas as sequências
                 
                 for periodo in periodos_unicos:
                     if row[periodo] == "Sim":
                         consecutivos_atual += 1
                         max_consecutivos = max(max_consecutivos, consecutivos_atual)
                     else:
+                        if consecutivos_atual > 0:
+                            sequencias.append(consecutivos_atual)
+                            min_consecutivos = min(min_consecutivos, consecutivos_atual)
                         consecutivos_atual = 0
                 
-                return max_consecutivos
+                # Adicionar a última sequência se terminar com "Sim"
+                if consecutivos_atual > 0:
+                    sequencias.append(consecutivos_atual)
+                    min_consecutivos = min(min_consecutivos, consecutivos_atual)
+                
+                # Calcular médio
+                if sequencias:
+                    medio_consecutivos = sum(sequencias) / len(sequencias)
+                else:
+                    medio_consecutivos = 0
+                    min_consecutivos = 0
+                
+                return max_consecutivos, min_consecutivos, medio_consecutivos
             
             # Aplicar função para calcular meses consecutivos
-            df_pandas_presenca['meses_consecutivos'] = df_pandas_presenca.apply(
+            resultados = df_pandas_presenca.apply(
                 lambda row: calcular_meses_consecutivos(row, periodos_unicos), axis=1
             )
             
+            # Separar os resultados em colunas
+            df_pandas_presenca['meses_consecutivos_maximo'] = [r[0] for r in resultados]
+            df_pandas_presenca['meses_consecutivos_minimo'] = [r[1] for r in resultados]
+            df_pandas_presenca['meses_consecutivos_medio'] = [r[2] for r in resultados]
+            
             # Criar tabela de meses consecutivos
-            df_meses_consecutivos = df_pandas_presenca[['aeroporto', 'aeronave', 'meses_consecutivos']].copy()
+            df_meses_consecutivos = df_pandas_presenca[['aeroporto', 'aeronave', 'meses_consecutivos_maximo', 'meses_consecutivos_minimo', 'meses_consecutivos_medio']].copy()
             
             # Filtrar apenas combinações que tiveram pelo menos 1 mês de movimento
-            df_meses_consecutivos = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos'] > 0]
+            df_meses_consecutivos = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] > 0]
             
-            # Ordenar por meses consecutivos (decrescente) e depois por aeroporto e aeronave
+            # Ordenar por meses consecutivos máximo (decrescente) e depois por aeroporto e aeronave
             df_meses_consecutivos = df_meses_consecutivos.sort_values(
-                ['meses_consecutivos', 'aeroporto', 'aeronave'], 
+                ['meses_consecutivos_maximo', 'aeroporto', 'aeronave'], 
                 ascending=[False, True, True]
             )
             
             # Mostrar informações sobre a tabela
             if len(df_meses_consecutivos) > 0:
-                max_meses = df_meses_consecutivos['meses_consecutivos'].max()
-                media_meses = df_meses_consecutivos['meses_consecutivos'].mean()
+                max_meses = df_meses_consecutivos['meses_consecutivos_maximo'].max()
+                media_meses = df_meses_consecutivos['meses_consecutivos_medio'].mean()
                 st.info(f"""
                 📊 **Informações da Tabela de Meses Consecutivos:**
                 - **Total de combinações com movimento:** {len(df_meses_consecutivos)}
                 - **Máximo de meses consecutivos:** {max_meses}
-                - **Média de meses consecutivos:** {media_meses:.1f}
+                - **Média de meses consecutivos médio:** {media_meses:.1f}
                 """)
             else:
                 st.info(f"""
                 📊 **Informações da Tabela de Meses Consecutivos:**
                 - **Total de combinações com movimento:** 0
                 - **Máximo de meses consecutivos:** 0
-                - **Média de meses consecutivos:** 0.0
+                - **Média de meses consecutivos médio:** 0.0
                 """)
             
             # Filtros para meses consecutivos
@@ -2417,7 +2439,7 @@ with tab3:
                 
                 with col_filtro_meses2:
                     # Valor para comparação
-                    max_valor_possivel = int(df_meses_consecutivos['meses_consecutivos'].max())
+                    max_valor_possivel = int(df_meses_consecutivos['meses_consecutivos_maximo'].max())
                     valor_filtro = st.number_input(
                         "🔢 **Valor:**",
                         min_value=0,
@@ -2429,15 +2451,15 @@ with tab3:
                 
                 # Aplicar filtro baseado no operador selecionado
                 if operador_meses == "Maior que (>)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos'] > valor_filtro]
+                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] > valor_filtro]
                 elif operador_meses == "Menor que (<)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos'] < valor_filtro]
+                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] < valor_filtro]
                 elif operador_meses == "Igual a (=)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos'] == valor_filtro]
+                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] == valor_filtro]
                 elif operador_meses == "Maior ou igual (≥)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos'] >= valor_filtro]
+                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] >= valor_filtro]
                 elif operador_meses == "Menor ou igual (≤)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos'] <= valor_filtro]
+                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] <= valor_filtro]
                 else:
                     df_meses_filtrado = df_meses_consecutivos
                 
@@ -2463,11 +2485,23 @@ with tab3:
                             help="Código da aeronave",
                             width="small"
                         ),
-                        "meses_consecutivos": st.column_config.NumberColumn(
-                            "Meses Consecutivos",
+                        "meses_consecutivos_maximo": st.column_config.NumberColumn(
+                            "Meses Consecutivos Máximo",
                             help="Máximo de meses consecutivos com movimentação",
                             width="medium",
                             format="%d"
+                        ),
+                        "meses_consecutivos_minimo": st.column_config.NumberColumn(
+                            "Meses Consecutivos Mínimo",
+                            help="Mínimo de meses consecutivos com movimentação",
+                            width="medium",
+                            format="%d"
+                        ),
+                        "meses_consecutivos_medio": st.column_config.NumberColumn(
+                            "Meses Consecutivos Médio",
+                            help="Média de meses consecutivos com movimentação",
+                            width="medium",
+                            format="%.1f"
                         )
                     }
                     
@@ -2485,7 +2519,7 @@ with tab3:
                     
                     if len(df_meses_filtrado) > 0:
                         # Calcular estatísticas
-                        max_meses = df_meses_filtrado['meses_consecutivos'].max()
+                        max_meses = df_meses_filtrado['meses_consecutivos_maximo'].max()
                         qtd_aeroportos = df_meses_filtrado['aeroporto'].nunique()
                         qtd_aeronaves = df_meses_filtrado['aeronave'].nunique()
                         aeroportos_unicos = sorted(df_meses_filtrado['aeroporto'].unique().tolist())
