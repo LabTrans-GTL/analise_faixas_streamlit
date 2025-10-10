@@ -2422,12 +2422,22 @@ with tab3:
             )
             
             # Mostrar informações sobre a tabela
-            st.info(f"""
-            📊 **Informações da Tabela de Meses Consecutivos:**
-            - **Total de combinações com movimento:** {len(df_meses_consecutivos)}
-            - **Máximo de meses consecutivos:** {df_meses_consecutivos['meses_consecutivos'].max() if len(df_meses_consecutivos) > 0 else 0}
-            - **Média de meses consecutivos:** {df_meses_consecutivos['meses_consecutivos'].mean():.1f if len(df_meses_consecutivos) > 0 else 0}
-            """)
+            if len(df_meses_consecutivos) > 0:
+                max_meses = df_meses_consecutivos['meses_consecutivos'].max()
+                media_meses = df_meses_consecutivos['meses_consecutivos'].mean()
+                st.info(f"""
+                📊 **Informações da Tabela de Meses Consecutivos:**
+                - **Total de combinações com movimento:** {len(df_meses_consecutivos)}
+                - **Máximo de meses consecutivos:** {max_meses}
+                - **Média de meses consecutivos:** {media_meses:.1f}
+                """)
+            else:
+                st.info(f"""
+                📊 **Informações da Tabela de Meses Consecutivos:**
+                - **Total de combinações com movimento:** 0
+                - **Máximo de meses consecutivos:** 0
+                - **Média de meses consecutivos:** 0.0
+                """)
             
             # Mostrar a tabela
             if len(df_meses_consecutivos) > 0:
