@@ -240,6 +240,9 @@ for aeroporto in aeroportos_excluidos:
         condicao = ~((pl.col("aeroporto") == aeroporto) & (pl.col("ano").is_in(anos_exclusao)))
         condicoes_exclusao1.append(condicao)
 
+# Adicionar filtro para excluir aeronave E110
+condicoes_exclusao1.append(pl.col("aeronave") != "E110")
+
 if condicoes_exclusao1:
     # Combinar todas as condições com AND
     condicao_final1 = condicoes_exclusao1[0]
@@ -1900,7 +1903,7 @@ with tab2:
         dicionario_aeronaves = {
             'ATR': '2C', 'E195': '4C', 'A20N': '3C', 'B738': '4C', 'A321': '4C', 'A320': '4C',
             'B38M': '4C', 'E295': '3C', 'B737': '4C', 'A21N': '4C', 'A319': '3C', 'C208': '1B',
-            'A332': '4E', 'B77W': '4E', 'A339': '4E', 'B763': '4D', 'B789': '4E', 'E110': '2B'
+            'A332': '4E', 'B77W': '4E', 'A339': '4E', 'B763': '4D', 'B789': '4E'
         }
         
         # Agrupar aeronaves por categoria a partir do dicionário
