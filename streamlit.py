@@ -2383,6 +2383,136 @@ with tab3:
                     aeronave_mais_combinacoes,
                     f"{count_aeronave} aeroportos"
                 )
+            
+            # Nova tabela: Meses Consecutivos
+            st.markdown("---")
+            st.markdown("#### 📅 **Tabela de Meses Consecutivos**")
+            st.markdown("### Quantidade máxima de meses consecutivos com movimentação por aeroporto e aeronave")
+            
+            # Calcular meses consecutivos para cada combinação aeroporto-aeronave
+            def calcular_meses_consecutivos(row, periodos_unicos):
+                """Calcula o máximo de meses consecutivos com movimento"""
+                max_consecutivos = 0
+                consecutivos_atual = 0
+                
+                for periodo in periodos_unicos:
+                    if row[periodo] == "Sim":
+                        consecutivos_atual += 1
+                        max_consecutivos = max(max_consecutivos, consecutivos_atual)
+                    else:
+                        consecutivos_atual = 0
+                
+                return max_consecutivos
+            
+            # Aplicar função para calcular meses consecutivos
+            df_pandas_presenca['meses_consecutivos'] = df_pandas_presenca.apply(
+                lambda row: calcular_meses_consecutivos(row, periodos_unicos), axis=1
+            )
+            
+            # Criar tabela de meses consecutivos
+            df_meses_consecutivos = df_pandas_presenca[['aeroporto', 'aeronave', 'meses_consecutivos']].copy()
+            
+            # Filtrar apenas combinações que tiveram pelo menos 1 mês de movimento
+            df_meses_consecutivos = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos'] > 0]
+            
+            # Ordenar por meses consecutivos (decrescente) e depois por aeroporto e aeronave
+            df_meses_consecutivos = df_meses_consecutivos.sort_values(
+                ['meses_consecutivos', 'aeroporto', 'aeronave'], 
+                ascending=[False, True, True]
+            )
+            
+            # Mostrar informações sobre a tabela
+            st.info(f"""
+            📊 **Informações da Tabela de Meses Consecutivos:**
+            - **Total de combinações com movimento:** {len(df_meses_consecutivos)}
+            - **Máximo de meses consecutivos:** {df_meses_consecutivos['meses_consecutivos'].max() if len(df_meses_consecutivos) > 0 else 0}
+            - **Média de meses consecutivos:** {df_meses_consecutivos['meses_consecutivos'].mean():.1f if len(df_meses_consecutivos) > 0 else 0}
+            """)
+            
+            # Mostrar a tabela
+            if len(df_meses_consecutivos) > 0:
+                # Configurar colunas da tabela
+                column_config_meses = {
+                    "aeroporto": st.column_config.TextColumn(
+                        "Aeroporto",
+                        help="Código do aeroporto",
+                        width="medium"
+                    ),
+                    "aeronave": st.column_config.TextColumn(
+                        "Aeronave", 
+                        help="Código da aeronave",
+                        width="small"
+                    ),
+                    "meses_consecutivos": st.column_config.NumberColumn(
+                        "Meses Consecutivos",
+                        help="Máximo de meses consecutivos com movimentação",
+                        width="medium",
+                        format="%d"
+                    )
+                }
+                
+                # Mostrar tabela
+                st.dataframe(
+                    df_meses_consecutivos,
+                    use_container_width=True,
+                    column_config=column_config_meses,
+                    hide_index=True
+                )
+                
+                # Estatísticas adicionais para meses consecutivos
+                st.markdown("---")
+                st.markdown("#### 📈 **Estatísticas de Meses Consecutivos**")
+                
+                col_meses1, col_meses2, col_meses3 = st.columns(3)
+                
+                with col_meses1:
+                    # Combinação com mais meses consecutivos
+                    if len(df_meses_consecutivos) > 0:
+                        max_meses = df_meses_consecutivos['meses_consecutivos'].max()
+                        combinacoes_max = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos'] == max_meses]
+                        st.metric(
+                            "Máximo de meses consecutivos",
+                            f"{max_meses}",
+                            f"{len(combinacoes_max)} combinações"
+                        )
+                
+                with col_meses2:
+                    # Aeroporto com maior sequência
+                    if len(df_meses_consecutivos) > 0:
+                        aeroporto_max_meses = df_meses_consecutivos.groupby('aeroporto')['meses_consecutivos'].max().idxmax()
+                        max_meses_aeroporto = df_meses_consecutivos.groupby('aeroporto')['meses_consecutivos'].max().max()
+                        st.metric(
+                            "Aeroporto com maior sequência",
+                            aeroporto_max_meses,
+                            f"{max_meses_aeroporto} meses"
+                        )
+                
+                with col_meses3:
+                    # Aeronave com maior sequência
+                    if len(df_meses_consecutivos) > 0:
+                        aeronave_max_meses = df_meses_consecutivos.groupby('aeronave')['meses_consecutivos'].max().idxmax()
+                        max_meses_aeronave = df_meses_consecutivos.groupby('aeronave')['meses_consecutivos'].max().max()
+                        st.metric(
+                            "Aeronave com maior sequência",
+                            aeronave_max_meses,
+                            f"{max_meses_aeronave} meses"
+                        )
+                
+                # Top 10 combinações com mais meses consecutivos
+                st.markdown("---")
+                st.markdown("#### 🏆 **Top 10 - Maiores Sequências de Meses Consecutivos**")
+                
+                top_10 = df_meses_consecutivos.head(10)
+                st.dataframe(
+                    top_10,
+                    use_container_width=True,
+                    column_config=column_config_meses,
+                    hide_index=True
+                )
+                
+            else:
+                st.warning("⚠️ **Nenhuma combinação com movimentação encontrada.**")
+                st.info("💡 Todas as combinações aeroporto-aeronave não tiveram movimentação nos períodos analisados.")
         
     else:
         st.warning("⚠️ **Nenhum dado de voos encontrado.**")
