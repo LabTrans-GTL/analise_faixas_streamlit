@@ -1912,7 +1912,7 @@ with tab2:
             aeronaves_por_categoria.setdefault(categoria, []).append(aeronave)
 
         # Ordenar categorias pela ordem desejada
-        ordem_info = ["1B", "2B", "2C", "3C", "4C", "4D", "4E"]
+        ordem_info = ["1B", "2C", "3C", "4C", "4D", "4E"]
         
         # Exibir cada categoria
         for categoria in ordem_info:
@@ -1954,7 +1954,7 @@ with tab2:
         thresholds = [1000.1, 3000, 6500, 12000, 19500, 30000, 50000, 79000, 150000, 310000, 600000, 2000000, 4000000, 10000000, 15000000, 50000000]
         
         # Ordem das categorias para garantir consistência
-        ordem_desejada = ["1B", "2B", "2C", "3C", "4C", "4D", "4E"]
+        ordem_desejada = ["1B", "2C", "3C", "4C", "4D", "4E"]
         
         # Obter todas as categorias únicas presentes nos dados do ano selecionado
         categorias_nos_dados = df_joined["categoria_aeronave"].unique().to_list()
