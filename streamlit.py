@@ -2200,6 +2200,17 @@ with tab3:
                 help="Selecione os aeroportos para incluir na análise. Se nenhum for selecionado, todos serão incluídos.",
                 key="filtro_aeroportos_presenca"
             )
+            
+            # Botões para aeroportos
+            col_btn_aeroporto1, col_btn_aeroporto2 = st.columns(2)
+            with col_btn_aeroporto1:
+                if st.button("✅ Selecionar Todos", key="btn_select_all_airports", help="Selecionar todos os aeroportos"):
+                    st.session_state["filtro_aeroportos_presenca"] = aeroportos_disponiveis
+                    st.rerun()
+            with col_btn_aeroporto2:
+                if st.button("❌ Limpar", key="btn_clear_airports", help="Limpar seleção de aeroportos"):
+                    st.session_state["filtro_aeroportos_presenca"] = []
+                    st.rerun()
         
         with col_filtro2:
             # Filtro por aeronave
@@ -2211,6 +2222,17 @@ with tab3:
                 help="Selecione as aeronaves para incluir na análise. Se nenhuma for selecionada, todas serão incluídas.",
                 key="filtro_aeronaves_presenca"
             )
+            
+            # Botões para aeronaves
+            col_btn_aeronave1, col_btn_aeronave2 = st.columns(2)
+            with col_btn_aeronave1:
+                if st.button("✅ Selecionar Todos", key="btn_select_all_aircraft", help="Selecionar todas as aeronaves"):
+                    st.session_state["filtro_aeronaves_presenca"] = aeronaves_disponiveis
+                    st.rerun()
+            with col_btn_aeronave2:
+                if st.button("❌ Limpar", key="btn_clear_aircraft", help="Limpar seleção de aeronaves"):
+                    st.session_state["filtro_aeronaves_presenca"] = []
+                    st.rerun()
         
         # Aplicar filtros
         if not aeroportos_selecionados:
