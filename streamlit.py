@@ -2638,7 +2638,7 @@ with tab3:
                             )
                         
                         with col_meses5:
-                            media_meses = df_meses_filtrado['meses_consecutivos'].mean()
+                            media_meses = df_meses_filtrado['meses_consecutivos_medio'].mean()
                             st.metric(
                                 "Média de meses consecutivos",
                                 f"{media_meses:.1f}",
