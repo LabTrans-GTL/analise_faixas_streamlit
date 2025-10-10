@@ -110,9 +110,9 @@ def carregar_dados():
         pl.col("ano").cast(pl.Int64)
     )
 
-    voos_aeroporto_aeronave = pl.read_parquet("voos_por_aeronave_aeroporto_trimestre3.parquet").with_columns(
+    voos_aeroporto_aeronave = pl.read_parquet("voos_por_aeronave_aeroporto_mes3.parquet").with_columns(
         pl.col("ano").cast(pl.Int64),
-        pl.col("trimestre").cast(pl.Int64)
+        pl.col("mes").cast(pl.Int64)
     )
 
     # Calcular o total de passageiros (pax) do DW por aeroporto e ano
@@ -144,11 +144,10 @@ def carregar_dados():
 aeroporto_pax, voos_aeroporto_aeronave, faixas_padrao = carregar_dados()
 
 # Filtrar dados para remover período 2025-T4
-# Aplicar filtro apenas ao DataFrame que possui coluna "trimestre"
-voos_aeroporto_aeronave = voos_aeroporto_aeronave.filter(
-    ~((pl.col("ano") == 2025) & (pl.col("trimestre") == 4))
-)
-# aeroporto_pax não possui coluna "trimestre", então não precisa deste filtro específico
+# Aplicar filtro apenas ao DataFrame que possui coluna "mês"
+
+
+# aeroporto_pax não possui coluna "mês", então não precisa deste filtro específico
 
  #--- SIDEBAR (BARRA LATERAL) PARA FILTROS ---
 st.sidebar.header("📊 Informações dos Dados")
@@ -902,9 +901,9 @@ with tab1:
             
             
             if df_voos_faixa.height > 0:
-                # Criar coluna de período (ano-trimestre)
+                # Criar coluna de período (ano-mês)
                 df_voos_periodo = df_voos_faixa.with_columns([
-                    (pl.col("ano").cast(pl.Utf8) + "-T" + pl.col("trimestre").cast(pl.Utf8)).alias("periodo")
+                    (pl.col("ano").cast(pl.Utf8) + "-M" + pl.col("mes").cast(pl.Utf8)).alias("periodo")
                 ])
                 
                 # NOVA LÓGICA: Filtrar por período específico
@@ -913,7 +912,7 @@ with tab1:
                 # Obter dados de faixas por período
                 faixas_por_periodo = (df_com_faixas
                                     .with_columns([
-                                        (pl.col("ano").cast(pl.Utf8) + "-T" + pl.lit("1")).alias("periodo_base")
+                                        (pl.col("ano").cast(pl.Utf8) + "-M" + pl.lit("1")).alias("periodo_base")
                                     ])
                                     .select(["aeroporto", "ano", "faixa_personalizada", "periodo_base"]))
                 
@@ -1023,7 +1022,7 @@ with tab1:
                     # Configurar layout do gráfico
                     fig.update_layout(
                         title=f"Evolução Temporal de Movimentos (P + D) - {faixa_selecionada_voos}",
-                        xaxis_title="Período (Ano-Trimestre)",
+                        xaxis_title="Período (Ano-Mês)",
                         yaxis_title="Quantidade de Movimentos (P + D)",
                         height=500,
                         hovermode='x unified',
@@ -1074,7 +1073,7 @@ with tab1:
                             column_config={
                                 "periodo": st.column_config.TextColumn(
                                     "Período",
-                                    help="Período no formato Ano-Trimestre"
+                                    help="Período no formato Ano-Mês"
                                 )
                             }
                         )
@@ -1161,7 +1160,7 @@ with tab1:
                         column_config = {
                             "periodo": st.column_config.TextColumn(
                                 "Período",
-                                help="Período no formato Ano-Trimestre",
+                                help="Período no formato Ano-Mês",
                                 width="medium"
                             )
                         }
@@ -1240,7 +1239,7 @@ with tab1:
                         # Configurar layout do gráfico
                         fig_passageiros.update_layout(
                             title=f"Passageiros (E + D) por Aeronave - {faixa_selecionada_voos}",
-                            xaxis_title="Período (Ano-Trimestre)",
+                            xaxis_title="Período (Ano-Mês)",
                             yaxis_title="Passageiros (E + D)",
                             height=500,
                             barmode='stack',  # Barras empilhadas
@@ -1493,9 +1492,9 @@ with tab1:
             df_voos_faixa_perc = df_filtrado1.filter(pl.col("aeroporto").is_in(lista_aeroportos_faixa_perc))
             
             if df_voos_faixa_perc.height > 0:
-                # Criar coluna de período (ano-trimestre)
+                # Criar coluna de período (ano-mês)
                 df_voos_periodo_perc = df_voos_faixa_perc.with_columns([
-                    (pl.col("ano").cast(pl.Utf8) + "-T" + pl.col("trimestre").cast(pl.Utf8)).alias("periodo")
+                    (pl.col("ano").cast(pl.Utf8) + "-M" + pl.col("mes").cast(pl.Utf8)).alias("periodo")
                 ])
                 
                 # NOVA LÓGICA: Filtrar por período específico
@@ -1504,7 +1503,7 @@ with tab1:
                 # Obter dados de faixas por período
                 faixas_por_periodo_perc = (df_com_faixas
                                          .with_columns([
-                                             (pl.col("ano").cast(pl.Utf8) + "-T" + pl.lit("1")).alias("periodo_base")
+                                             (pl.col("ano").cast(pl.Utf8) + "-M" + pl.lit("1")).alias("periodo_base")
                                          ])
                                          .select(["aeroporto", "ano", "faixa_personalizada", "periodo_base"]))
                 
@@ -1652,7 +1651,7 @@ with tab1:
                     # Configurar layout do gráfico
                     fig_perc.update_layout(
                         title=f"Percentual de Aeroportos por Aeronave - {faixa_selecionada_perc}",
-                        xaxis_title="Período (Ano-Trimestre)",
+                        xaxis_title="Período (Ano-Mês)",
                         yaxis_title="Percentual de Aeroportos (%)",
                         height=500,
                         barmode='group',  # Barras agrupadas
