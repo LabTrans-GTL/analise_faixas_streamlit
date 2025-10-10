@@ -2604,10 +2604,11 @@ with tab3:
                     if len(df_meses_filtrado) > 0:
                         # Calcular estatísticas
                         max_meses = df_meses_filtrado['meses_consecutivos_maximo'].max()
-                        qtd_aeroportos = df_meses_filtrado['aeroporto'].nunique()
-                        qtd_aeronaves = df_meses_filtrado['aeronave'].nunique()
-                        aeroportos_unicos = sorted(df_meses_filtrado['aeroporto'].unique().tolist())
-                        aeronaves_unicas = sorted(df_meses_filtrado['aeronave'].unique().tolist())
+                        # Usar dados da tabela de presença filtrada para aeroportos e aeronaves
+                        qtd_aeroportos = df_presenca_filtrado['aeroporto'].nunique()
+                        qtd_aeronaves = df_presenca_filtrado['aeronave'].nunique()
+                        aeroportos_unicos = sorted(df_presenca_filtrado['aeroporto'].unique().tolist())
+                        aeronaves_unicas = sorted(df_presenca_filtrado['aeronave'].unique().tolist())
                         
                         # Layout em 5 colunas
                         col_meses1, col_meses2, col_meses3, col_meses4, col_meses5 = st.columns(5)
