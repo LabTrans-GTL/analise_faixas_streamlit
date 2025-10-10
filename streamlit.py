@@ -2194,26 +2194,22 @@ with tab3:
             # Filtro por aeroporto
             aeroportos_disponiveis = sorted(df_presenca["aeroporto"].unique().to_list())
             
-            # Botões para aeroportos (antes do multiselect)
-            col_btn_aeroporto1, col_btn_aeroporto2 = st.columns(2)
-            with col_btn_aeroporto1:
-                btn_select_all_airports = st.button("✅ Selecionar Todos", key="btn_select_all_airports", help="Selecionar todos os aeroportos")
-            with col_btn_aeroporto2:
-                btn_clear_airports = st.button("❌ Limpar", key="btn_clear_airports", help="Limpar seleção de aeroportos")
+            # Inicializar session_state se não existir
+            if "filtro_aeroportos_presenca" not in st.session_state:
+                st.session_state["filtro_aeroportos_presenca"] = aeroportos_disponiveis
             
-            # Determinar valor padrão baseado nos botões
+            # Botão para aeroportos (antes do multiselect)
+            btn_select_all_airports = st.button("✅ Selecionar Todos", key="btn_select_all_airports", help="Selecionar todos os aeroportos")
+            
+            # Atualizar session_state quando botão for clicado
             if btn_select_all_airports:
-                default_aeroportos = aeroportos_disponiveis
-            elif btn_clear_airports:
-                default_aeroportos = []
-            else:
-                # Usar session_state se existir, senão usar todos
-                default_aeroportos = st.session_state.get("filtro_aeroportos_presenca", aeroportos_disponiveis)
+                st.session_state["filtro_aeroportos_presenca"] = aeroportos_disponiveis
+                st.rerun()
             
             aeroportos_selecionados = st.multiselect(
                 "🏢 **Filtrar por Aeroportos:**",
                 options=aeroportos_disponiveis,
-                default=default_aeroportos,
+                default=st.session_state["filtro_aeroportos_presenca"],
                 help="Selecione os aeroportos para incluir na análise. Se nenhum for selecionado, todos serão incluídos.",
                 key="filtro_aeroportos_presenca"
             )
@@ -2222,26 +2218,22 @@ with tab3:
             # Filtro por aeronave
             aeronaves_disponiveis = sorted(df_presenca["aeronave"].unique().to_list())
             
-            # Botões para aeronaves (antes do multiselect)
-            col_btn_aeronave1, col_btn_aeronave2 = st.columns(2)
-            with col_btn_aeronave1:
-                btn_select_all_aircraft = st.button("✅ Selecionar Todos", key="btn_select_all_aircraft", help="Selecionar todas as aeronaves")
-            with col_btn_aeronave2:
-                btn_clear_aircraft = st.button("❌ Limpar", key="btn_clear_aircraft", help="Limpar seleção de aeronaves")
+            # Inicializar session_state se não existir
+            if "filtro_aeronaves_presenca" not in st.session_state:
+                st.session_state["filtro_aeronaves_presenca"] = aeronaves_disponiveis
             
-            # Determinar valor padrão baseado nos botões
+            # Botão para aeronaves (antes do multiselect)
+            btn_select_all_aircraft = st.button("✅ Selecionar Todos", key="btn_select_all_aircraft", help="Selecionar todas as aeronaves")
+            
+            # Atualizar session_state quando botão for clicado
             if btn_select_all_aircraft:
-                default_aeronaves = aeronaves_disponiveis
-            elif btn_clear_aircraft:
-                default_aeronaves = []
-            else:
-                # Usar session_state se existir, senão usar todas
-                default_aeronaves = st.session_state.get("filtro_aeronaves_presenca", aeronaves_disponiveis)
+                st.session_state["filtro_aeronaves_presenca"] = aeronaves_disponiveis
+                st.rerun()
             
             aeronaves_selecionadas = st.multiselect(
                 "✈️ **Filtrar por Aeronaves:**",
                 options=aeronaves_disponiveis,
-                default=default_aeronaves,
+                default=st.session_state["filtro_aeronaves_presenca"],
                 help="Selecione as aeronaves para incluir na análise. Se nenhuma for selecionada, todas serão incluídas.",
                 key="filtro_aeronaves_presenca"
             )
