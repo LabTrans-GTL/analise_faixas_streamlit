@@ -110,10 +110,38 @@ def carregar_dados():
         pl.col("ano").cast(pl.Int64)
     )
 
-    voos_aeroporto_aeronave = pl.read_parquet("voos_por_aeronave_aeroporto_mes3.parquet").with_columns(
-        pl.col("ano").cast(pl.Int64),
-        pl.col("mes").cast(pl.Int64)
-    )
+    # Carregar dados de voos
+    voos_aeroporto_aeronave = pl.read_parquet("voos_por_aeronave_aeroporto_mes3.parquet")
+    
+    # DEBUG: Mostrar colunas disponíveis
+    st.write("🔍 **DEBUG - Colunas disponíveis no arquivo:**", voos_aeroporto_aeronave.columns)
+    st.write("📊 **Shape do DataFrame:**", voos_aeroporto_aeronave.shape)
+    
+    # Verificar se tem coluna 'mes' ou 'trimestre'
+    if "mes" in voos_aeroporto_aeronave.columns:
+        voos_aeroporto_aeronave = voos_aeroporto_aeronave.with_columns([
+            pl.col("ano").cast(pl.Int64),
+            pl.col("mes").cast(pl.Int64)
+        ])
+    elif "trimestre" in voos_aeroporto_aeronave.columns:
+        voos_aeroporto_aeronave = voos_aeroporto_aeronave.with_columns([
+            pl.col("ano").cast(pl.Int64),
+            pl.col("trimestre").cast(pl.Int64)
+        ])
+        # Converter trimestre para mês (1->1, 2->4, 3->7, 4->10)
+        voos_aeroporto_aeronave = voos_aeroporto_aeronave.with_columns([
+            ((pl.col("trimestre") - 1) * 3 + 1).alias("mes")
+        ])
+    else:
+        # Se não tem nem 'mes' nem 'trimestre', tentar carregar o arquivo trimestral
+        voos_aeroporto_aeronave = pl.read_parquet("voos_por_aeronave_aeroporto_trimestre3.parquet").with_columns([
+            pl.col("ano").cast(pl.Int64),
+            pl.col("trimestre").cast(pl.Int64)
+        ])
+        # Converter trimestre para mês
+        voos_aeroporto_aeronave = voos_aeroporto_aeronave.with_columns([
+            ((pl.col("trimestre") - 1) * 3 + 1).alias("mes")
+        ])
 
     # Calcular o total de passageiros (pax) do DW por aeroporto e ano
     pax_dw = (voos_aeroporto_aeronave
@@ -141,7 +169,17 @@ def carregar_dados():
 }
     return aeroporto_pax, voos_aeroporto_aeronave, faixas_padrao
 
+# Carregar dados e mostrar informações de debug
 aeroporto_pax, voos_aeroporto_aeronave, faixas_padrao = carregar_dados()
+
+# Mostrar informações de debug no início da aplicação
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🔍 **Informações de Debug**")
+st.sidebar.write("**Colunas do DataFrame de voos:**")
+st.sidebar.write(voos_aeroporto_aeronave.columns)
+st.sidebar.write(f"**Shape:** {voos_aeroporto_aeronave.shape}")
+st.sidebar.write(f"**Primeiras linhas:**")
+st.sidebar.write(voos_aeroporto_aeronave.head(3))
 
 # Filtrar dados para remover período 2025-T4
 # Aplicar filtro apenas ao DataFrame que possui coluna "mês"
