@@ -2408,9 +2408,11 @@ with tab3:
             if len(df_meses_consecutivos) > 0:
                 max_meses = df_meses_consecutivos['meses_consecutivos_maximo'].max()
                 media_meses = df_meses_consecutivos['meses_consecutivos_medio'].mean()
+                total_aeroportos = df_meses_consecutivos['aeroporto'].nunique()
                 st.info(f"""
                 📊 **Informações da Tabela de Meses Consecutivos:**
                 - **Total de combinações com movimento:** {len(df_meses_consecutivos)}
+                - **Total de aeroportos:** {total_aeroportos}
                 - **Máximo de meses consecutivos:** {max_meses}
                 - **Média de meses consecutivos médio:** {media_meses:.1f}
                 """)
@@ -2418,6 +2420,7 @@ with tab3:
                 st.info(f"""
                 📊 **Informações da Tabela de Meses Consecutivos:**
                 - **Total de combinações com movimento:** 0
+                - **Total de aeroportos:** 0
                 - **Máximo de meses consecutivos:** 0
                 - **Média de meses consecutivos médio:** 0.0
                 """)
