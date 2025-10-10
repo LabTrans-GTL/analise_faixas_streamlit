@@ -923,8 +923,8 @@ with tab1:
                 df_voos_filtrado_por_periodo = pl.DataFrame()
                 
                 for periodo in periodos_voos:
-                    # Extrair ano do período (formato: "2022-T1")
-                    ano_periodo = int(periodo.split("-T")[0])
+                    # Extrair ano do período (formato: "2022-M1")
+                    ano_periodo = int(periodo.split("-M")[0])
                     
                     # Obter aeroportos que estavam na faixa selecionada neste ano específico
                     aeroportos_faixa_ano = (faixas_por_periodo
@@ -983,7 +983,7 @@ with tab1:
                 df_pivot_voos = df_pandas_voos.pivot(index='periodo', columns='aeronave', values='total_voos').fillna(0)
                 
                 # Ordenar os períodos corretamente
-                periodos_ordenados = sorted(df_pivot_voos.index, key=lambda x: (int(x.split('-')[0]), int(x.split('-T')[1])))
+                periodos_ordenados = sorted(df_pivot_voos.index, key=lambda x: (int(x.split('-')[0]), int(x.split('-M')[1])))
                 df_pivot_voos = df_pivot_voos.reindex(periodos_ordenados)
                 
                 # Mostrar informações sobre a análise
@@ -1122,7 +1122,7 @@ with tab1:
                     ).fillna(0)
                     
                     # Ordenar os períodos corretamente
-                    periodos_ordenados_passageiros = sorted(df_pivot_passageiros.index, key=lambda x: (int(x.split('-')[0]), int(x.split('-T')[1])))
+                    periodos_ordenados_passageiros = sorted(df_pivot_passageiros.index, key=lambda x: (int(x.split('-')[0]), int(x.split('-M')[1])))
                     df_pivot_passageiros = df_pivot_passageiros.reindex(periodos_ordenados_passageiros)
                     
                     # Verificar se há dados para mostrar
@@ -1303,7 +1303,7 @@ with tab1:
                     # Filtrar dados para a aeronave e período selecionados
                     # NOVA LÓGICA: Usar o mesmo filtro por período específico
                     # Extrair ano do período selecionado
-                    ano_periodo_detalhe = int(periodo_selecionado_detalhe.split("-T")[0])
+                    ano_periodo_detalhe = int(periodo_selecionado_detalhe.split("-M")[0])
                     
                     # Obter aeroportos que estavam na faixa selecionada neste ano específico
                     aeroportos_faixa_ano_detalhe = (df_com_faixas
@@ -1514,8 +1514,8 @@ with tab1:
                 df_voos_filtrado_por_periodo_perc = pl.DataFrame()
                 
                 for periodo in periodos_voos_perc:
-                    # Extrair ano do período (formato: "2022-T1")
-                    ano_periodo = int(periodo.split("-T")[0])
+                    # Extrair ano do período (formato: "2022-M1")
+                    ano_periodo = int(periodo.split("-M")[0])
                     
                     # Obter aeroportos que estavam na faixa selecionada neste ano específico
                     aeroportos_faixa_ano_perc = (faixas_por_periodo_perc
@@ -1586,7 +1586,7 @@ with tab1:
                 df_pivot_perc = df_pandas_perc.pivot(index='periodo', columns='aeronave', values='percentual').fillna(0)
                 
                 # Ordenar os períodos corretamente
-                periodos_ordenados_perc = sorted(df_pivot_perc.index, key=lambda x: (int(x.split('-')[0]), int(x.split('-T')[1])))
+                periodos_ordenados_perc = sorted(df_pivot_perc.index, key=lambda x: (int(x.split('-')[0]), int(x.split('-M')[1])))
                 df_pivot_perc = df_pivot_perc.reindex(periodos_ordenados_perc)
                 
                 # Mostrar informações sobre a análise
@@ -1761,7 +1761,7 @@ with tab1:
                     # Filtrar dados para a aeronave e período selecionados
                     # NOVA LÓGICA: Usar o mesmo filtro por período específico
                     # Extrair ano do período selecionado
-                    ano_periodo_detalhe_perc = int(periodo_selecionado_detalhe_perc.split("-T")[0])
+                    ano_periodo_detalhe_perc = int(periodo_selecionado_detalhe_perc.split("-M")[0])
                     
                     # Obter aeroportos que estavam na faixa selecionada neste ano específico
                     aeroportos_faixa_ano_detalhe_perc = (df_com_faixas
