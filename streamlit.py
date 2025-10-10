@@ -2344,45 +2344,6 @@ with tab3:
                 hide_index=True
             )
         
-            # Estatísticas adicionais
-            st.markdown("---")
-            st.markdown("#### 📈 **Estatísticas de Presença**")
-            
-            col_stat1, col_stat2, col_stat3 = st.columns(3)
-            
-            with col_stat1:
-                # Total de movimentos por período
-                movimentos_por_periodo = {}
-                for periodo in periodos_unicos:
-                    count = (df_pandas_presenca[periodo] == "Sim").sum()
-                    movimentos_por_periodo[periodo] = count
-                
-                periodo_mais_movimento = max(movimentos_por_periodo, key=movimentos_por_periodo.get)
-                st.metric(
-                    "Período com mais movimentos",
-                    f"{periodo_mais_movimento}",
-                    f"{movimentos_por_periodo[periodo_mais_movimento]} combinações"
-                )
-            
-            with col_stat2:
-                # Aeroporto com mais combinações
-                aeroporto_mais_combinacoes = df_pandas_presenca["aeroporto"].value_counts().index[0]
-                count_aeroporto = df_pandas_presenca["aeroporto"].value_counts().iloc[0]
-                st.metric(
-                    "Aeroporto com mais combinações",
-                    aeroporto_mais_combinacoes,
-                    f"{count_aeroporto} aeronaves"
-                )
-            
-            with col_stat3:
-                # Aeronave com mais combinações
-                aeronave_mais_combinacoes = df_pandas_presenca["aeronave"].value_counts().index[0]
-                count_aeronave = df_pandas_presenca["aeronave"].value_counts().iloc[0]
-                st.metric(
-                    "Aeronave com mais combinações",
-                    aeronave_mais_combinacoes,
-                    f"{count_aeronave} aeroportos"
-                )
             
             # Nova tabela: Meses Consecutivos
             st.markdown("---")
