@@ -1918,18 +1918,31 @@ with tab2:
                 aeronaves_str = ", ".join(aeronaves_list)
                 st.markdown(f"**{categoria}**: {aeronaves_str}")
 
-    # Seletor de ano
+    # Seletor de anos (múltipla seleção)
     anos_disponiveis_categoria = sorted(df_filtrado1["ano"].unique().to_list())
-    ano_selecionado_categoria = st.selectbox(
-        "🗓️ **Selecione o Ano para Análise:**",
+    anos_selecionados_categoria = st.multiselect(
+        "🗓️ **Selecione os Anos para Análise:**",
         options=anos_disponiveis_categoria,
-        index=len(anos_disponiveis_categoria) - 1,
-        key="ano_categoria_faixa"
+        default=[anos_disponiveis_categoria[-1]],  # Último ano por padrão
+        help="Selecione um ou mais anos para somar os dados. Se nenhum ano for selecionado, será usado o último ano disponível.",
+        key="anos_categoria_faixa"
     )
+    
+    # Se nenhum ano foi selecionado, usar o último ano disponível
+    if not anos_selecionados_categoria:
+        anos_selecionados_categoria = [anos_disponiveis_categoria[-1]]
+        st.info(f"ℹ️ Nenhum ano selecionado. Usando o último ano disponível: **{anos_selecionados_categoria[0]}**")
+    
+    # Mostrar informação sobre os anos selecionados
+    if len(anos_selecionados_categoria) > 1:
+        anos_ordenados = sorted(anos_selecionados_categoria)
+        st.info(f"📊 **Análise agregada:** Os dados dos anos **{', '.join(map(str, anos_ordenados))}** serão somados para esta análise.")
+    else:
+        st.info(f"📊 **Análise do ano:** {anos_selecionados_categoria[0]}")
 
-    # Filtrar dados pelo ano selecionado
-    df_ano_voos = df_filtrado1.filter(pl.col("ano") == ano_selecionado_categoria)
-    df_ano_pax = df_filtrado2.filter(pl.col("ano") == ano_selecionado_categoria).select(["aeroporto", "passageiros_projetado"])
+    # Filtrar dados pelos anos selecionados
+    df_ano_voos = df_filtrado1.filter(pl.col("ano").is_in(anos_selecionados_categoria))
+    df_ano_pax = df_filtrado2.filter(pl.col("ano").is_in(anos_selecionados_categoria)).select(["aeroporto", "passageiros_projetado"])
     
     df_joined = df_ano_voos.join(df_ano_pax, on="aeroporto", how="left").drop_nulls()
 
@@ -2004,7 +2017,13 @@ with tab2:
             df_final = pl.concat(results_data).sort("limite_passageiros")
 
             # Gráfico de linhas
-            st.markdown(f"#### 📈 **Participação de categoria de aeronave por Faixa de Passageiros - {ano_selecionado_categoria}**")
+            if len(anos_selecionados_categoria) == 1:
+                titulo_anos = f"{anos_selecionados_categoria[0]}"
+            else:
+                anos_ordenados = sorted(anos_selecionados_categoria)
+                titulo_anos = f"{anos_ordenados[0]}-{anos_ordenados[-1]} ({len(anos_selecionados_categoria)} anos)"
+            
+            st.markdown(f"#### 📈 **Participação de categoria de aeronave por Faixa de Passageiros - {titulo_anos}**")
 
             # Gerar cores consistentes para as categorias
             cores_paleta_cat = gerar_paleta_cores_aeronaves()
@@ -2143,8 +2162,10 @@ with tab2:
             st.dataframe(df_pivot_table)
 
         else:
-            st.warning(f"⚠️ Nenhum dado de categoria encontrado para o ano {ano_selecionado_categoria}.")
+            anos_str = ", ".join(map(str, sorted(anos_selecionados_categoria)))
+            st.warning(f"⚠️ Nenhum dado de categoria encontrado para os anos {anos_str}.")
     else:
-        st.warning(f"⚠️ Nenhum dado de voos encontrado para o ano {ano_selecionado_categoria}.")
+        anos_str = ", ".join(map(str, sorted(anos_selecionados_categoria)))
+        st.warning(f"⚠️ Nenhum dado de voos encontrado para os anos {anos_str}.")
 
 
