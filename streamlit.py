@@ -2185,129 +2185,178 @@ with tab3:
         # Obter períodos únicos e ordená-los
         periodos_unicos = sorted(df_presenca["periodo"].unique().to_list())
         
-        # Criar tabela de presença: aeroporto + aeronave como chave, períodos como colunas
-        df_presenca_tabela = (df_presenca
-                             .group_by(["aeroporto", "aeronave"])
-                             .agg([
-                                 pl.col("periodo").unique().alias("periodos_com_movimento")
-                             ]))
+        # Filtros por aeroporto e aeronave
+        st.markdown("#### 🔍 **Filtros**")
         
-        # Criar DataFrame com todas as combinações aeroporto-aeronave e todos os períodos
-        aeroportos_unicos = sorted(df_presenca["aeroporto"].unique().to_list())
-        aeronaves_unicas = sorted(df_presenca["aeronave"].unique().to_list())
+        col_filtro1, col_filtro2 = st.columns(2)
         
-        # Criar todas as combinações
-        combinacoes = []
-        for aeroporto in aeroportos_unicos:
-            for aeronave in aeronaves_unicas:
-                combinacoes.append({"aeroporto": aeroporto, "aeronave": aeronave})
-        
-        df_combinacoes = pl.DataFrame(combinacoes)
-        
-        # Fazer join com os dados de presença
-        df_final_presenca = df_combinacoes.join(df_presenca_tabela, on=["aeroporto", "aeronave"], how="left")
-        
-        # Criar colunas para cada período
-        for periodo in periodos_unicos:
-            df_final_presenca = df_final_presenca.with_columns([
-                pl.when(pl.col("periodos_com_movimento").is_not_null() & 
-                       pl.col("periodos_com_movimento").list.contains(periodo))
-                .then(pl.lit("Sim"))
-                .otherwise(pl.lit("Não"))
-                .alias(periodo)
-            ])
-        
-        # Remover coluna auxiliar
-        df_final_presenca = df_final_presenca.drop("periodos_com_movimento")
-        
-        # Ordenar por aeroporto e aeronave
-        df_final_presenca = df_final_presenca.sort(["aeroporto", "aeronave"])
-        
-        # Mostrar informações sobre a tabela
-        st.info(f"""
-        📊 **Informações da Tabela:**
-        - **Total de aeroportos:** {len(aeroportos_unicos)}
-        - **Total de aeronaves:** {len(aeronaves_unicas)}
-        - **Períodos analisados:** {len(periodos_unicos)} ({periodos_unicos[0]} a {periodos_unicos[-1]})
-        - **Total de combinações:** {len(combinacoes)}
-        """)
-        
-        # Mostrar a tabela
-        st.markdown("#### 📋 **Tabela de Presença de Movimentos**")
-        st.markdown("*'Sim' = Existe movimento | 'Não' = Sem movimento*")
-        
-        # Converter para pandas para exibição
-        df_pandas_presenca = df_final_presenca.to_pandas()
-        
-        # Configurar colunas da tabela
-        column_config = {
-            "aeroporto": st.column_config.TextColumn(
-                "Aeroporto",
-                help="Código do aeroporto",
-                width="medium"
-            ),
-            "aeronave": st.column_config.TextColumn(
-                "Aeronave", 
-                help="Código da aeronave",
-                width="small"
-            )
-        }
-        
-        # Adicionar configuração para colunas de período
-        for periodo in periodos_unicos:
-            column_config[periodo] = st.column_config.TextColumn(
-                periodo,
-                help=f"Movimento em {periodo}",
-                width="small"
+        with col_filtro1:
+            # Filtro por aeroporto
+            aeroportos_disponiveis = sorted(df_presenca["aeroporto"].unique().to_list())
+            aeroportos_selecionados = st.multiselect(
+                "🏢 **Filtrar por Aeroportos:**",
+                options=aeroportos_disponiveis,
+                default=aeroportos_disponiveis,  # Todos selecionados por padrão
+                help="Selecione os aeroportos para incluir na análise. Se nenhum for selecionado, todos serão incluídos.",
+                key="filtro_aeroportos_presenca"
             )
         
-        # Mostrar tabela com paginação
-        st.dataframe(
-            df_pandas_presenca,
-            use_container_width=True,
-            column_config=column_config,
-            hide_index=True
+        with col_filtro2:
+            # Filtro por aeronave
+            aeronaves_disponiveis = sorted(df_presenca["aeronave"].unique().to_list())
+            aeronaves_selecionadas = st.multiselect(
+                "✈️ **Filtrar por Aeronaves:**",
+                options=aeronaves_disponiveis,
+                default=aeronaves_disponiveis,  # Todas selecionadas por padrão
+                help="Selecione as aeronaves para incluir na análise. Se nenhuma for selecionada, todas serão incluídas.",
+                key="filtro_aeronaves_presenca"
+            )
+        
+        # Aplicar filtros
+        if not aeroportos_selecionados:
+            aeroportos_selecionados = aeroportos_disponiveis
+        if not aeronaves_selecionadas:
+            aeronaves_selecionadas = aeronaves_disponiveis
+        
+        # Filtrar dados pelos seletores
+        df_presenca_filtrado = df_presenca.filter(
+            (pl.col("aeroporto").is_in(aeroportos_selecionados)) &
+            (pl.col("aeronave").is_in(aeronaves_selecionadas))
         )
         
-        # Estatísticas adicionais
-        st.markdown("---")
-        st.markdown("#### 📈 **Estatísticas de Presença**")
+        # Mostrar informações sobre os filtros aplicados
+        if len(aeroportos_selecionados) < len(aeroportos_disponiveis) or len(aeronaves_selecionadas) < len(aeronaves_disponiveis):
+            st.info(f"🔍 **Filtros ativos:** {len(aeroportos_selecionados)} aeroportos, {len(aeronaves_selecionadas)} aeronaves")
         
-        col_stat1, col_stat2, col_stat3 = st.columns(3)
+        # Verificar se há dados após filtros
+        if df_presenca_filtrado.height == 0:
+            st.warning("⚠️ **Nenhum dado encontrado** com os filtros selecionados.")
+            st.info("💡 Tente ajustar os filtros de aeroporto ou aeronave.")
+        else:
         
-        with col_stat1:
-            # Total de movimentos por período
-            movimentos_por_periodo = {}
-            for periodo in periodos_unicos:
-                count = (df_pandas_presenca[periodo] == "Sim").sum()
-                movimentos_por_periodo[periodo] = count
+            # Criar tabela de presença: aeroporto + aeronave como chave, períodos como colunas
+            df_presenca_tabela = (df_presenca_filtrado
+                                 .group_by(["aeroporto", "aeronave"])
+                                 .agg([
+                                     pl.col("periodo").unique().alias("periodos_com_movimento")
+                                 ]))
             
-            periodo_mais_movimento = max(movimentos_por_periodo, key=movimentos_por_periodo.get)
-            st.metric(
-                "Período com mais movimentos",
-                f"{periodo_mais_movimento}",
-                f"{movimentos_por_periodo[periodo_mais_movimento]} combinações"
+            # Criar DataFrame com todas as combinações aeroporto-aeronave e todos os períodos
+            aeroportos_unicos = sorted(df_presenca_filtrado["aeroporto"].unique().to_list())
+            aeronaves_unicas = sorted(df_presenca_filtrado["aeronave"].unique().to_list())
+        
+            # Criar todas as combinações
+            combinacoes = []
+            for aeroporto in aeroportos_unicos:
+                for aeronave in aeronaves_unicas:
+                    combinacoes.append({"aeroporto": aeroporto, "aeronave": aeronave})
+            
+            df_combinacoes = pl.DataFrame(combinacoes)
+            
+            # Fazer join com os dados de presença
+            df_final_presenca = df_combinacoes.join(df_presenca_tabela, on=["aeroporto", "aeronave"], how="left")
+            
+            # Criar colunas para cada período
+            for periodo in periodos_unicos:
+                df_final_presenca = df_final_presenca.with_columns([
+                    pl.when(pl.col("periodos_com_movimento").is_not_null() & 
+                           pl.col("periodos_com_movimento").list.contains(periodo))
+                    .then(pl.lit("Sim"))
+                    .otherwise(pl.lit("Não"))
+                    .alias(periodo)
+                ])
+            
+            # Remover coluna auxiliar
+            df_final_presenca = df_final_presenca.drop("periodos_com_movimento")
+            
+            # Ordenar por aeroporto e aeronave
+            df_final_presenca = df_final_presenca.sort(["aeroporto", "aeronave"])
+        
+            # Mostrar informações sobre a tabela
+            st.info(f"""
+            📊 **Informações da Tabela:**
+            - **Total de aeroportos:** {len(aeroportos_unicos)}
+            - **Total de aeronaves:** {len(aeronaves_unicas)}
+            - **Períodos analisados:** {len(periodos_unicos)} ({periodos_unicos[0]} a {periodos_unicos[-1]})
+            - **Total de combinações:** {len(combinacoes)}
+            """)
+            
+            # Mostrar a tabela
+            st.markdown("#### 📋 **Tabela de Presença de Movimentos**")
+            st.markdown("*'Sim' = Existe movimento | 'Não' = Sem movimento*")
+            
+            # Converter para pandas para exibição
+            df_pandas_presenca = df_final_presenca.to_pandas()
+            
+            # Configurar colunas da tabela
+            column_config = {
+                "aeroporto": st.column_config.TextColumn(
+                    "Aeroporto",
+                    help="Código do aeroporto",
+                    width="medium"
+                ),
+                "aeronave": st.column_config.TextColumn(
+                    "Aeronave", 
+                    help="Código da aeronave",
+                    width="small"
+                )
+            }
+            
+            # Adicionar configuração para colunas de período
+            for periodo in periodos_unicos:
+                column_config[periodo] = st.column_config.TextColumn(
+                    periodo,
+                    help=f"Movimento em {periodo}",
+                    width="small"
+                )
+            
+            # Mostrar tabela com paginação
+            st.dataframe(
+                df_pandas_presenca,
+                use_container_width=True,
+                column_config=column_config,
+                hide_index=True
             )
         
-        with col_stat2:
-            # Aeroporto com mais combinações
-            aeroporto_mais_combinacoes = df_pandas_presenca["aeroporto"].value_counts().index[0]
-            count_aeroporto = df_pandas_presenca["aeroporto"].value_counts().iloc[0]
-            st.metric(
-                "Aeroporto com mais combinações",
-                aeroporto_mais_combinacoes,
-                f"{count_aeroporto} aeronaves"
-            )
-        
-        with col_stat3:
-            # Aeronave com mais combinações
-            aeronave_mais_combinacoes = df_pandas_presenca["aeronave"].value_counts().index[0]
-            count_aeronave = df_pandas_presenca["aeronave"].value_counts().iloc[0]
-            st.metric(
-                "Aeronave com mais combinações",
-                aeronave_mais_combinacoes,
-                f"{count_aeronave} aeroportos"
-            )
+            # Estatísticas adicionais
+            st.markdown("---")
+            st.markdown("#### 📈 **Estatísticas de Presença**")
+            
+            col_stat1, col_stat2, col_stat3 = st.columns(3)
+            
+            with col_stat1:
+                # Total de movimentos por período
+                movimentos_por_periodo = {}
+                for periodo in periodos_unicos:
+                    count = (df_pandas_presenca[periodo] == "Sim").sum()
+                    movimentos_por_periodo[periodo] = count
+                
+                periodo_mais_movimento = max(movimentos_por_periodo, key=movimentos_por_periodo.get)
+                st.metric(
+                    "Período com mais movimentos",
+                    f"{periodo_mais_movimento}",
+                    f"{movimentos_por_periodo[periodo_mais_movimento]} combinações"
+                )
+            
+            with col_stat2:
+                # Aeroporto com mais combinações
+                aeroporto_mais_combinacoes = df_pandas_presenca["aeroporto"].value_counts().index[0]
+                count_aeroporto = df_pandas_presenca["aeroporto"].value_counts().iloc[0]
+                st.metric(
+                    "Aeroporto com mais combinações",
+                    aeroporto_mais_combinacoes,
+                    f"{count_aeroporto} aeronaves"
+                )
+            
+            with col_stat3:
+                # Aeronave com mais combinações
+                aeronave_mais_combinacoes = df_pandas_presenca["aeronave"].value_counts().index[0]
+                count_aeronave = df_pandas_presenca["aeronave"].value_counts().iloc[0]
+                st.metric(
+                    "Aeronave com mais combinações",
+                    aeronave_mais_combinacoes,
+                    f"{count_aeronave} aeroportos"
+                )
         
     else:
         st.warning("⚠️ **Nenhum dado de voos encontrado.**")
