@@ -2426,51 +2426,132 @@ with tab3:
             if len(df_meses_consecutivos) > 0:
                 st.markdown("#### 🔍 **Filtros para Meses Consecutivos**")
                 
-                col_filtro_meses1, col_filtro_meses2 = st.columns(2)
+                # Criar 3 colunas para os filtros
+                col_filtro_max, col_filtro_min, col_filtro_med = st.columns(3)
                 
-                with col_filtro_meses1:
-                    # Operador de comparação
-                    operador_meses = st.selectbox(
+                with col_filtro_max:
+                    st.markdown("##### 📈 **Filtro por Máximo**")
+                    
+                    # Operador para máximo
+                    operador_max = st.selectbox(
                         "📊 **Operador:**",
                         options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
-                        help="Selecione o operador de comparação para filtrar os meses consecutivos",
-                        key="operador_meses_consecutivos"
+                        help="Selecione o operador para filtrar por meses consecutivos máximo",
+                        key="operador_meses_maximo"
                     )
-                
-                with col_filtro_meses2:
-                    # Valor para comparação
-                    max_valor_possivel = int(df_meses_consecutivos['meses_consecutivos_maximo'].max())
-                    valor_filtro = st.number_input(
+                    
+                    # Valor para máximo
+                    max_valor_max = int(df_meses_consecutivos['meses_consecutivos_maximo'].max())
+                    valor_max = st.number_input(
                         "🔢 **Valor:**",
                         min_value=0,
-                        max_value=max_valor_possivel,
+                        max_value=max_valor_max,
                         value=1,
-                        help=f"Digite o valor para comparação (0 a {max_valor_possivel})",
-                        key="valor_filtro_meses"
+                        help=f"Digite o valor para comparação (0 a {max_valor_max})",
+                        key="valor_filtro_maximo"
                     )
                 
-                # Aplicar filtro baseado no operador selecionado
-                if operador_meses == "Maior que (>)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] > valor_filtro]
-                elif operador_meses == "Menor que (<)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] < valor_filtro]
-                elif operador_meses == "Igual a (=)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] == valor_filtro]
-                elif operador_meses == "Maior ou igual (≥)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] >= valor_filtro]
-                elif operador_meses == "Menor ou igual (≤)":
-                    df_meses_filtrado = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] <= valor_filtro]
-                else:
-                    df_meses_filtrado = df_meses_consecutivos
+                with col_filtro_min:
+                    st.markdown("##### 📉 **Filtro por Mínimo**")
+                    
+                    # Operador para mínimo
+                    operador_min = st.selectbox(
+                        "📊 **Operador:**",
+                        options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
+                        help="Selecione o operador para filtrar por meses consecutivos mínimo",
+                        key="operador_meses_minimo"
+                    )
+                    
+                    # Valor para mínimo
+                    max_valor_min = int(df_meses_consecutivos['meses_consecutivos_minimo'].max())
+                    valor_min = st.number_input(
+                        "🔢 **Valor:**",
+                        min_value=0,
+                        max_value=max_valor_min,
+                        value=1,
+                        help=f"Digite o valor para comparação (0 a {max_valor_min})",
+                        key="valor_filtro_minimo"
+                    )
                 
-                # Mostrar informações sobre o filtro aplicado
+                with col_filtro_med:
+                    st.markdown("##### 📊 **Filtro por Médio**")
+                    
+                    # Operador para médio
+                    operador_med = st.selectbox(
+                        "📊 **Operador:**",
+                        options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
+                        help="Selecione o operador para filtrar por meses consecutivos médio",
+                        key="operador_meses_medio"
+                    )
+                    
+                    # Valor para médio
+                    max_valor_med = float(df_meses_consecutivos['meses_consecutivos_medio'].max())
+                    valor_med = st.number_input(
+                        "🔢 **Valor:**",
+                        min_value=0.0,
+                        max_value=max_valor_med,
+                        value=1.0,
+                        step=0.1,
+                        help=f"Digite o valor para comparação (0.0 a {max_valor_med:.1f})",
+                        key="valor_filtro_medio"
+                    )
+                
+                # Aplicar filtros combinados
+                df_meses_filtrado = df_meses_consecutivos.copy()
+                
+                # Filtro por máximo
+                if operador_max == "Maior que (>)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_maximo'] > valor_max]
+                elif operador_max == "Menor que (<)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_maximo'] < valor_max]
+                elif operador_max == "Igual a (=)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_maximo'] == valor_max]
+                elif operador_max == "Maior ou igual (≥)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_maximo'] >= valor_max]
+                elif operador_max == "Menor ou igual (≤)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_maximo'] <= valor_max]
+                
+                # Filtro por mínimo
+                if operador_min == "Maior que (>)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_minimo'] > valor_min]
+                elif operador_min == "Menor que (<)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_minimo'] < valor_min]
+                elif operador_min == "Igual a (=)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_minimo'] == valor_min]
+                elif operador_min == "Maior ou igual (≥)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_minimo'] >= valor_min]
+                elif operador_min == "Menor ou igual (≤)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_minimo'] <= valor_min]
+                
+                # Filtro por médio
+                if operador_med == "Maior que (>)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_medio'] > valor_med]
+                elif operador_med == "Menor que (<)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_medio'] < valor_med]
+                elif operador_med == "Igual a (=)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_medio'] == valor_med]
+                elif operador_med == "Maior ou igual (≥)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_medio'] >= valor_med]
+                elif operador_med == "Menor ou igual (≤)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_medio'] <= valor_med]
+                
+                # Mostrar informações sobre os filtros aplicados
+                filtros_ativos = []
                 if len(df_meses_filtrado) != len(df_meses_consecutivos):
-                    st.info(f"🔍 **Filtro ativo:** {operador_meses} {valor_filtro} | **Resultados:** {len(df_meses_filtrado)} de {len(df_meses_consecutivos)} combinações")
+                    if operador_max != "Maior que (>)":  # Se não for o padrão
+                        filtros_ativos.append(f"Máximo: {operador_max} {valor_max}")
+                    if operador_min != "Maior que (>)":  # Se não for o padrão
+                        filtros_ativos.append(f"Mínimo: {operador_min} {valor_min}")
+                    if operador_med != "Maior que (>)":  # Se não for o padrão
+                        filtros_ativos.append(f"Médio: {operador_med} {valor_med}")
+                    
+                    if filtros_ativos:
+                        st.info(f"🔍 **Filtros ativos:** {' | '.join(filtros_ativos)} | **Resultados:** {len(df_meses_filtrado)} de {len(df_meses_consecutivos)} combinações")
                 
                 # Verificar se há resultados após filtro
                 if len(df_meses_filtrado) == 0:
-                    st.warning(f"⚠️ **Nenhum resultado encontrado** com o filtro {operador_meses} {valor_filtro}.")
-                    st.info("💡 Tente ajustar o operador ou valor do filtro.")
+                    st.warning("⚠️ **Nenhum resultado encontrado** com os filtros aplicados.")
+                    st.info("💡 Tente ajustar os operadores ou valores dos filtros.")
                 else:
                     # Mostrar a tabela filtrada
                     # Configurar colunas da tabela
