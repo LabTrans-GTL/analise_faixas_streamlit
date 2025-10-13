@@ -2194,6 +2194,18 @@ with tab3:
             # Filtro por aeroporto
             aeroportos_disponiveis = sorted(df_presenca["aeroporto"].unique().to_list())
             
+            # Botão para selecionar todos os aeroportos
+            col_btn_airports, col_info_airports = st.columns([1, 3])
+            with col_btn_airports:
+                if st.button("✅ Todos", key="btn_select_all_airports", help="Selecionar todos os aeroportos"):
+                    # Limpar a seleção atual para forçar seleção de todos
+                    if "filtro_aeroportos_presenca" in st.session_state:
+                        del st.session_state["filtro_aeroportos_presenca"]
+                    st.rerun()
+            
+            with col_info_airports:
+                st.caption("💡 Clique em 'Todos' para voltar a ver todos os aeroportos")
+            
             aeroportos_selecionados = st.multiselect(
                 "🏢 **Filtrar por Aeroportos:**",
                 options=aeroportos_disponiveis,
@@ -2201,15 +2213,22 @@ with tab3:
                 help="Selecione os aeroportos para incluir na análise. Se nenhum for selecionado, todos serão incluídos.",
                 key="filtro_aeroportos_presenca"
             )
-            
-            # Botão para aeroportos (depois do multiselect)
-            if st.button("✅ Selecionar Todos", key="btn_select_all_airports", help="Selecionar todos os aeroportos"):
-                st.session_state["filtro_aeroportos_presenca"] = aeroportos_disponiveis
-                st.rerun()
         
         with col_filtro2:
             # Filtro por aeronave
             aeronaves_disponiveis = sorted(df_presenca["aeronave"].unique().to_list())
+            
+            # Botão para selecionar todas as aeronaves
+            col_btn_aircraft, col_info_aircraft = st.columns([1, 3])
+            with col_btn_aircraft:
+                if st.button("✅ Todos", key="btn_select_all_aircraft", help="Selecionar todas as aeronaves"):
+                    # Limpar a seleção atual para forçar seleção de todas
+                    if "filtro_aeronaves_presenca" in st.session_state:
+                        del st.session_state["filtro_aeronaves_presenca"]
+                    st.rerun()
+            
+            with col_info_aircraft:
+                st.caption("💡 Clique em 'Todos' para voltar a ver todas as aeronaves")
             
             aeronaves_selecionadas = st.multiselect(
                 "✈️ **Filtrar por Aeronaves:**",
@@ -2218,11 +2237,6 @@ with tab3:
                 help="Selecione as aeronaves para incluir na análise. Se nenhuma for selecionada, todas serão incluídas.",
                 key="filtro_aeronaves_presenca"
             )
-            
-            # Botão para aeronaves (depois do multiselect)
-            if st.button("✅ Selecionar Todos", key="btn_select_all_aircraft", help="Selecionar todas as aeronaves"):
-                st.session_state["filtro_aeronaves_presenca"] = aeronaves_disponiveis
-                st.rerun()
         
         # Aplicar filtros
         if not aeroportos_selecionados:
