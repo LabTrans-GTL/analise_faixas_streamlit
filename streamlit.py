@@ -2866,9 +2866,7 @@ with tab3:
                     📊 **Estatísticas da Tabela de Detalhamento:**
                     - **Total de movimentos (P + D):** {formatar_numero(total_movimentos)}
                     - **Total de passageiros (E + D):** {formatar_numero(total_passageiros)}
-                    - **Combinações aeroporto-aeronave:** {combinacoes_unicas}
                     - **Períodos únicos:** {periodos_unicos_detalhamento}
-                    - **Registros totais:** {len(df_detalhamento_pandas)}
                     """)
                 else:
                     st.warning("⚠️ **Nenhum dado disponível para a tabela de detalhamento** com os filtros aplicados.")
