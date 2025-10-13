@@ -2721,9 +2721,12 @@ with tab3:
                     # Informações sobre o gráfico
                     st.info(f"""
                     📊 **Informações do Gráfico:**
-                    - **Combinações mostradas:** {len(df_grafico_long['combinacao'].unique())}
-                    - **Períodos analisados:** {len(periodos_unicos)}
+                    - **Combinações mostradas (aeroporto-aeronave):** {len(df_grafico_long['combinacao'].unique())}
+                    - **Aeroportos mostrados:** {len(df_grafico_long['aeroporto'].unique())}
+                    - **Aeronaves mostradas:** {len(df_grafico_long['aeronave'].unique())}
                     - **Valores:** 0 = Sem movimento, 1 = Com movimento
+                    - **Dica:** Clique duas vezes em um aeroporto-aeronave na legenda para destacar apenas essa combinação. Clique duas vezes para voltar a ver todas as combinações.
+                    - **Observação:** O gráfico mostra as combinações mostradas anteriormente na Tabela de Meses Consecutivos
                     """)
                 else:
                     st.warning("⚠️ **Nenhum dado disponível para o gráfico** com os filtros aplicados.")
