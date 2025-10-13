@@ -2450,7 +2450,7 @@ with tab3:
                 total_aeroportos = df_meses_consecutivos['aeroporto'].nunique()
                 st.info(f"""
                 📊 **Informações da Tabela de Meses Consecutivos:**
-                - **Total de combinações com movimento:** {len(df_meses_consecutivos)}
+                - **Total de combinações:** {len(df_meses_consecutivos)}
                 - **Total de aeroportos:** {total_aeroportos}
                 - **Máximo de meses consecutivos:** {max_meses}
                 - **Média de meses consecutivos médio:** {media_meses:.1f}
