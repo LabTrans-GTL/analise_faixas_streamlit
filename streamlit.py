@@ -2160,7 +2160,7 @@ with tab2:
 
             # Tabela de dados detalhados
             st.markdown("---")
-            st.markdown("#### 📋 **Dados Detalhados (Percentual de Movimentos (P + D) %)")
+            st.markdown("#### 📋 **Dados Detalhados (Percentual de Movimentos (P + D) %)**")
             
             df_pivot_table = df_final.to_pandas().pivot(
                 index='categoria_aeronave',
@@ -2176,7 +2176,7 @@ with tab2:
             
             # Nova tabela de dados detalhados para passageiros
             st.markdown("---")
-            st.markdown("#### 📋 **Dados Detalhados (Percentual de Passageiros (E + D) %)")
+            st.markdown("#### 📋 **Dados Detalhados (Percentual de Passageiros (E + D) %)**")
             
             df_pivot_table_passageiros = df_final.to_pandas().pivot(
                 index='categoria_aeronave',
