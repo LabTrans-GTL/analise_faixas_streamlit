@@ -2522,10 +2522,11 @@ with tab3:
             
             # Filtros para meses consecutivos e sem operação
             if len(df_meses_consecutivos) > 0:
-                st.markdown("#### 🔍 **Filtros para Meses Consecutivos e Sem Operação**")
+                # Seção 1: Filtros para Meses Consecutivos
+                st.markdown("#### 🔍 **Filtros para Meses Consecutivos**")
                 
-                # Criar 6 colunas para os filtros (3 para meses consecutivos + 3 para meses sem operação)
-                col_filtro_max, col_filtro_min, col_filtro_med, col_filtro_sem_max, col_filtro_sem_min, col_filtro_sem_med = st.columns(6)
+                # Criar 3 colunas para os filtros de meses consecutivos
+                col_filtro_max, col_filtro_min, col_filtro_med = st.columns(3)
                 
                 with col_filtro_max:
                     st.markdown("##### 📈 **Filtro por Máximo**")
@@ -2597,7 +2598,13 @@ with tab3:
                         key="valor_filtro_medio"
                     )
                 
-                # Filtros para Meses Sem Operação
+                # Seção 2: Filtros para Meses Sem Operação
+                st.markdown("---")
+                st.markdown("#### 🔍 **Filtros para Meses Sem Operação**")
+                
+                # Criar 3 colunas para os filtros de meses sem operação
+                col_filtro_sem_max, col_filtro_sem_min, col_filtro_sem_med = st.columns(3)
+                
                 with col_filtro_sem_max:
                     st.markdown("##### 📈 **Filtro por Máximo Sem Operação**")
                     
