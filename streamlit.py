@@ -2343,9 +2343,7 @@ with tab3:
             - **Total de aeroportos:** {len(aeroportos_unicos)}
             - **Total de aeronaves:** {len(aeronaves_unicas)}
             - **Períodos analisados:** {len(periodos_unicos)} ({periodos_unicos[0]} a {periodos_unicos[-1]})
-            - **Total de combinações:** {len(combinacoes)}
-            - **Combinações com movimento:** {df_final_presenca.height}
-            - **Combinações sem movimento:** {len(combinacoes) - df_final_presenca.height}
+            - **Total de combinações:** {df_final_presenca.height}
             """)
             
             # Mostrar a tabela
