@@ -2469,6 +2469,7 @@ with tab3:
                     operador_max = st.selectbox(
                         "📊 **Operador:**",
                         options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
+                        index=3,  # "Maior ou igual (≥)" como padrão
                         help="Selecione o operador para filtrar por meses consecutivos máximo",
                         key="operador_meses_maximo"
                     )
@@ -2491,6 +2492,7 @@ with tab3:
                     operador_min = st.selectbox(
                         "📊 **Operador:**",
                         options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
+                        index=3,  # "Maior ou igual (≥)" como padrão
                         help="Selecione o operador para filtrar por meses consecutivos mínimo",
                         key="operador_meses_minimo"
                     )
@@ -2513,6 +2515,7 @@ with tab3:
                     operador_med = st.selectbox(
                         "📊 **Operador:**",
                         options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
+                        index=3,  # "Maior ou igual (≥)" como padrão
                         help="Selecione o operador para filtrar por meses consecutivos médio",
                         key="operador_meses_medio"
                     )
@@ -2571,11 +2574,11 @@ with tab3:
                 # Mostrar informações sobre os filtros aplicados
                 filtros_ativos = []
                 if len(df_meses_filtrado) != len(df_meses_consecutivos):
-                    if operador_max != "Maior que (>)":  # Se não for o padrão
+                    if operador_max != "Maior ou igual (≥)" or valor_max != 1:  # Se não for o padrão
                         filtros_ativos.append(f"Máximo: {operador_max} {valor_max}")
-                    if operador_min != "Maior que (>)":  # Se não for o padrão
+                    if operador_min != "Maior ou igual (≥)" or valor_min != 1:  # Se não for o padrão
                         filtros_ativos.append(f"Mínimo: {operador_min} {valor_min}")
-                    if operador_med != "Maior que (>)":  # Se não for o padrão
+                    if operador_med != "Maior ou igual (≥)" or valor_med != 1.0:  # Se não for o padrão
                         filtros_ativos.append(f"Médio: {operador_med} {valor_med}")
                     
                     if filtros_ativos:
