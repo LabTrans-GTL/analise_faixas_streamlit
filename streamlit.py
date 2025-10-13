@@ -2225,6 +2225,12 @@ with tab3:
             if "filtro_aeroportos_presenca" not in st.session_state:
                 st.session_state["filtro_aeroportos_presenca"] = aeroportos_disponiveis
             
+            # Garantir que o session_state contém apenas valores válidos
+            valores_validos = [a for a in st.session_state["filtro_aeroportos_presenca"] if a in aeroportos_disponiveis]
+            if not valores_validos:
+                valores_validos = aeroportos_disponiveis
+            st.session_state["filtro_aeroportos_presenca"] = valores_validos
+            
             # Botão para selecionar todos os aeroportos
             col_btn_airports, col_info_airports = st.columns([1, 3])
             with col_btn_airports:
@@ -2250,6 +2256,12 @@ with tab3:
             # Inicializar session_state se não existir
             if "filtro_aeronaves_presenca" not in st.session_state:
                 st.session_state["filtro_aeronaves_presenca"] = aeronaves_disponiveis
+            
+            # Garantir que o session_state contém apenas valores válidos
+            valores_validos_aeronaves = [a for a in st.session_state["filtro_aeronaves_presenca"] if a in aeronaves_disponiveis]
+            if not valores_validos_aeronaves:
+                valores_validos_aeronaves = aeronaves_disponiveis
+            st.session_state["filtro_aeronaves_presenca"] = valores_validos_aeronaves
             
             # Botão para selecionar todas as aeronaves
             col_btn_aircraft, col_info_aircraft = st.columns([1, 3])
