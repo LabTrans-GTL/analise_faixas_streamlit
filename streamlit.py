@@ -1601,8 +1601,9 @@ with tab1:
                 # Métricas da análise - Aeroportos por ano na faixa
                 utilizacao_maxima = df_pandas_perc['percentual'].max()
                 
-                # Calcular aeroportos únicos por ano na faixa selecionada (usando dados filtrados por período)
-                aeroportos_por_ano_faixa = (df_voos_filtrado_por_periodo_perc
+                # Calcular aeroportos únicos por ano na faixa selecionada (usando dados de faixas diretamente)
+                aeroportos_por_ano_faixa = (df_com_faixas
+                                           .filter(pl.col("faixa_personalizada") == faixa_selecionada_perc)
                                            .group_by("ano")
                                            .agg([
                                                pl.n_unique("aeroporto").alias("total_aeroportos")
