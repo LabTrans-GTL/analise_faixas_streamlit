@@ -2224,18 +2224,20 @@ with tab3:
             col_btn_airports, col_info_airports = st.columns([1, 3])
             with col_btn_airports:
                 if st.button("✅ Todos", key="btn_select_all_airports", help="Selecionar todos os aeroportos"):
-                    # Limpar a seleção atual para forçar seleção de todos
-                    if "filtro_aeroportos_presenca" in st.session_state:
-                        del st.session_state["filtro_aeroportos_presenca"]
+                    # Definir todos os aeroportos como selecionados
+                    st.session_state["filtro_aeroportos_presenca"] = aeroportos_disponiveis
                     st.rerun()
             
             with col_info_airports:
                 st.caption("💡 Clique em 'Todos' para voltar a ver todos os aeroportos")
             
+            # Verificar se há seleção no session_state, senão usar padrão
+            default_airports = st.session_state.get("filtro_aeroportos_presenca", aeroportos_disponiveis)
+            
             aeroportos_selecionados = st.multiselect(
                 "🏢 **Filtrar por Aeroportos:**",
                 options=aeroportos_disponiveis,
-                default=aeroportos_disponiveis,
+                default=default_airports,
                 help="Selecione os aeroportos para incluir na análise. Se nenhum for selecionado, todos serão incluídos.",
                 key="filtro_aeroportos_presenca"
             )
@@ -2248,18 +2250,20 @@ with tab3:
             col_btn_aircraft, col_info_aircraft = st.columns([1, 3])
             with col_btn_aircraft:
                 if st.button("✅ Todos", key="btn_select_all_aircraft", help="Selecionar todas as aeronaves"):
-                    # Limpar a seleção atual para forçar seleção de todas
-                    if "filtro_aeronaves_presenca" in st.session_state:
-                        del st.session_state["filtro_aeronaves_presenca"]
+                    # Definir todas as aeronaves como selecionadas
+                    st.session_state["filtro_aeronaves_presenca"] = aeronaves_disponiveis
                     st.rerun()
             
             with col_info_aircraft:
                 st.caption("💡 Clique em 'Todos' para voltar a ver todas as aeronaves")
             
+            # Verificar se há seleção no session_state, senão usar padrão
+            default_aircraft = st.session_state.get("filtro_aeronaves_presenca", aeronaves_disponiveis)
+            
             aeronaves_selecionadas = st.multiselect(
                 "✈️ **Filtrar por Aeronaves:**",
                 options=aeronaves_disponiveis,
-                default=aeronaves_disponiveis,
+                default=default_aircraft,
                 help="Selecione as aeronaves para incluir na análise. Se nenhuma for selecionada, todas serão incluídas.",
                 key="filtro_aeronaves_presenca"
             )
