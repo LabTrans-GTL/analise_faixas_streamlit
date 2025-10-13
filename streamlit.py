@@ -2520,12 +2520,12 @@ with tab3:
                 - **Média de meses consecutivos médio:** 0.0
                 """)
             
-            # Filtros para meses consecutivos
+            # Filtros para meses consecutivos e sem operação
             if len(df_meses_consecutivos) > 0:
-                st.markdown("#### 🔍 **Filtros para Meses Consecutivos**")
+                st.markdown("#### 🔍 **Filtros para Meses Consecutivos e Sem Operação**")
                 
-                # Criar 3 colunas para os filtros
-                col_filtro_max, col_filtro_min, col_filtro_med = st.columns(3)
+                # Criar 6 colunas para os filtros (3 para meses consecutivos + 3 para meses sem operação)
+                col_filtro_max, col_filtro_min, col_filtro_med, col_filtro_sem_max, col_filtro_sem_min, col_filtro_sem_med = st.columns(6)
                 
                 with col_filtro_max:
                     st.markdown("##### 📈 **Filtro por Máximo**")
@@ -2597,6 +2597,77 @@ with tab3:
                         key="valor_filtro_medio"
                     )
                 
+                # Filtros para Meses Sem Operação
+                with col_filtro_sem_max:
+                    st.markdown("##### 📈 **Filtro por Máximo Sem Operação**")
+                    
+                    # Operador para máximo sem operação
+                    operador_sem_max = st.selectbox(
+                        "📊 **Operador:**",
+                        options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
+                        index=3,  # "Maior ou igual (≥)" como padrão
+                        help="Selecione o operador para filtrar por meses sem operação máximo",
+                        key="operador_meses_sem_maximo"
+                    )
+                    
+                    # Valor para máximo sem operação
+                    max_valor_sem_max = int(df_meses_consecutivos['meses_sem_operacao_maximo'].max())
+                    valor_sem_max = st.number_input(
+                        "🔢 **Valor:**",
+                        min_value=0,
+                        max_value=max_valor_sem_max,
+                        value=1,
+                        help=f"Digite o valor para comparação (0 a {max_valor_sem_max})",
+                        key="valor_filtro_sem_maximo"
+                    )
+                
+                with col_filtro_sem_min:
+                    st.markdown("##### 📉 **Filtro por Mínimo Sem Operação**")
+                    
+                    # Operador para mínimo sem operação
+                    operador_sem_min = st.selectbox(
+                        "📊 **Operador:**",
+                        options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
+                        index=3,  # "Maior ou igual (≥)" como padrão
+                        help="Selecione o operador para filtrar por meses sem operação mínimo",
+                        key="operador_meses_sem_minimo"
+                    )
+                    
+                    # Valor para mínimo sem operação
+                    max_valor_sem_min = int(df_meses_consecutivos['meses_sem_operacao_minimo'].max())
+                    valor_sem_min = st.number_input(
+                        "🔢 **Valor:**",
+                        min_value=0,
+                        max_value=max_valor_sem_min,
+                        value=1,
+                        help=f"Digite o valor para comparação (0 a {max_valor_sem_min})",
+                        key="valor_filtro_sem_minimo"
+                    )
+                
+                with col_filtro_sem_med:
+                    st.markdown("##### 📊 **Filtro por Médio Sem Operação**")
+                    
+                    # Operador para médio sem operação
+                    operador_sem_med = st.selectbox(
+                        "📊 **Operador:**",
+                        options=["Maior que (>)", "Menor que (<)", "Igual a (=)", "Maior ou igual (≥)", "Menor ou igual (≤)"],
+                        index=3,  # "Maior ou igual (≥)" como padrão
+                        help="Selecione o operador para filtrar por meses sem operação médio",
+                        key="operador_meses_sem_medio"
+                    )
+                    
+                    # Valor para médio sem operação
+                    max_valor_sem_med = float(df_meses_consecutivos['meses_sem_operacao_medio'].max())
+                    valor_sem_med = st.number_input(
+                        "🔢 **Valor:**",
+                        min_value=0.0,
+                        max_value=max_valor_sem_med,
+                        value=1.0,
+                        step=0.1,
+                        help=f"Digite o valor para comparação (0.0 a {max_valor_sem_med:.1f})",
+                        key="valor_filtro_sem_medio"
+                    )
+                
                 # Aplicar filtros combinados
                 df_meses_filtrado = df_meses_consecutivos.copy()
                 
@@ -2636,6 +2707,42 @@ with tab3:
                 elif operador_med == "Menor ou igual (≤)":
                     df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_consecutivos_medio'] <= valor_med]
                 
+                # Filtro por máximo sem operação
+                if operador_sem_max == "Maior que (>)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_maximo'] > valor_sem_max]
+                elif operador_sem_max == "Menor que (<)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_maximo'] < valor_sem_max]
+                elif operador_sem_max == "Igual a (=)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_maximo'] == valor_sem_max]
+                elif operador_sem_max == "Maior ou igual (≥)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_maximo'] >= valor_sem_max]
+                elif operador_sem_max == "Menor ou igual (≤)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_maximo'] <= valor_sem_max]
+                
+                # Filtro por mínimo sem operação
+                if operador_sem_min == "Maior que (>)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_minimo'] > valor_sem_min]
+                elif operador_sem_min == "Menor que (<)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_minimo'] < valor_sem_min]
+                elif operador_sem_min == "Igual a (=)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_minimo'] == valor_sem_min]
+                elif operador_sem_min == "Maior ou igual (≥)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_minimo'] >= valor_sem_min]
+                elif operador_sem_min == "Menor ou igual (≤)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_minimo'] <= valor_sem_min]
+                
+                # Filtro por médio sem operação
+                if operador_sem_med == "Maior que (>)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_medio'] > valor_sem_med]
+                elif operador_sem_med == "Menor que (<)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_medio'] < valor_sem_med]
+                elif operador_sem_med == "Igual a (=)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_medio'] == valor_sem_med]
+                elif operador_sem_med == "Maior ou igual (≥)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_medio'] >= valor_sem_med]
+                elif operador_sem_med == "Menor ou igual (≤)":
+                    df_meses_filtrado = df_meses_filtrado[df_meses_filtrado['meses_sem_operacao_medio'] <= valor_sem_med]
+                
                 # Mostrar informações sobre os filtros aplicados
                 filtros_ativos = []
                 if len(df_meses_filtrado) != len(df_meses_consecutivos):
@@ -2645,6 +2752,12 @@ with tab3:
                         filtros_ativos.append(f"Mínimo: {operador_min} {valor_min}")
                     if operador_med != "Maior ou igual (≥)" or valor_med != 1.0:  # Se não for o padrão
                         filtros_ativos.append(f"Médio: {operador_med} {valor_med}")
+                    if operador_sem_max != "Maior ou igual (≥)" or valor_sem_max != 1:  # Se não for o padrão
+                        filtros_ativos.append(f"Máx. Sem Op.: {operador_sem_max} {valor_sem_max}")
+                    if operador_sem_min != "Maior ou igual (≥)" or valor_sem_min != 1:  # Se não for o padrão
+                        filtros_ativos.append(f"Mín. Sem Op.: {operador_sem_min} {valor_sem_min}")
+                    if operador_sem_med != "Maior ou igual (≥)" or valor_sem_med != 1.0:  # Se não for o padrão
+                        filtros_ativos.append(f"Méd. Sem Op.: {operador_sem_med} {valor_sem_med}")
                     
                     if filtros_ativos:
                         st.info(f"🔍 **Filtros ativos:** {' | '.join(filtros_ativos)} | **Resultados:** {len(df_meses_filtrado)} de {len(df_meses_consecutivos)} combinações")
