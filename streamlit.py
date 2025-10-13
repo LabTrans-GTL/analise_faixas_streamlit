@@ -2411,39 +2411,68 @@ with tab3:
             # Nova tabela: Meses Consecutivos
             st.markdown("---")
             st.markdown("#### 📅 **Tabela de Meses Consecutivos**")
-            st.markdown("### Análise de meses consecutivos (máximo, mínimo e médio) com movimentação por aeroporto e aeronave")
+            st.markdown("### Análise de meses consecutivos com e sem operação (máximo, mínimo e médio) por aeroporto e aeronave")
             
-            # Calcular meses consecutivos para cada combinação aeroporto-aeronave
+            # Calcular meses consecutivos e sem operação para cada combinação aeroporto-aeronave
             def calcular_meses_consecutivos(row, periodos_unicos):
-                """Calcula máximo, mínimo e médio de meses consecutivos com movimento"""
+                """Calcula máximo, mínimo e médio de meses consecutivos com movimento e sem operação"""
                 max_consecutivos = 0
                 min_consecutivos = float('inf')
                 consecutivos_atual = 0
-                sequencias = []  # Lista para armazenar todas as sequências
+                sequencias = []  # Lista para armazenar todas as sequências de movimento
+                
+                max_sem_operacao = 0
+                min_sem_operacao = float('inf')
+                sem_operacao_atual = 0
+                sequencias_sem_operacao = []  # Lista para armazenar todas as sequências sem operação
                 
                 for periodo in periodos_unicos:
                     if row[periodo] == "Sim":
+                        # Finalizar sequência sem operação se existir
+                        if sem_operacao_atual > 0:
+                            sequencias_sem_operacao.append(sem_operacao_atual)
+                            min_sem_operacao = min(min_sem_operacao, sem_operacao_atual)
+                        sem_operacao_atual = 0
+                        
+                        # Continuar sequência de movimento
                         consecutivos_atual += 1
                         max_consecutivos = max(max_consecutivos, consecutivos_atual)
                     else:
+                        # Finalizar sequência de movimento se existir
                         if consecutivos_atual > 0:
                             sequencias.append(consecutivos_atual)
                             min_consecutivos = min(min_consecutivos, consecutivos_atual)
                         consecutivos_atual = 0
+                        
+                        # Continuar sequência sem operação
+                        sem_operacao_atual += 1
+                        max_sem_operacao = max(max_sem_operacao, sem_operacao_atual)
                 
                 # Adicionar a última sequência se terminar com "Sim"
                 if consecutivos_atual > 0:
                     sequencias.append(consecutivos_atual)
                     min_consecutivos = min(min_consecutivos, consecutivos_atual)
                 
-                # Calcular médio
+                # Adicionar a última sequência se terminar com "Não"
+                if sem_operacao_atual > 0:
+                    sequencias_sem_operacao.append(sem_operacao_atual)
+                    min_sem_operacao = min(min_sem_operacao, sem_operacao_atual)
+                
+                # Calcular médios
                 if sequencias:
                     medio_consecutivos = sum(sequencias) / len(sequencias)
                 else:
                     medio_consecutivos = 0
                     min_consecutivos = 0
                 
-                return max_consecutivos, min_consecutivos, medio_consecutivos
+                if sequencias_sem_operacao:
+                    medio_sem_operacao = sum(sequencias_sem_operacao) / len(sequencias_sem_operacao)
+                else:
+                    medio_sem_operacao = 0
+                    min_sem_operacao = 0
+                
+                return (max_consecutivos, min_consecutivos, medio_consecutivos, 
+                        max_sem_operacao, min_sem_operacao, medio_sem_operacao)
             
             # Aplicar função para calcular meses consecutivos
             resultados = df_pandas_presenca.apply(
@@ -2454,9 +2483,12 @@ with tab3:
             df_pandas_presenca['meses_consecutivos_maximo'] = [r[0] for r in resultados]
             df_pandas_presenca['meses_consecutivos_minimo'] = [r[1] for r in resultados]
             df_pandas_presenca['meses_consecutivos_medio'] = [r[2] for r in resultados]
+            df_pandas_presenca['meses_sem_operacao_maximo'] = [r[3] for r in resultados]
+            df_pandas_presenca['meses_sem_operacao_minimo'] = [r[4] for r in resultados]
+            df_pandas_presenca['meses_sem_operacao_medio'] = [r[5] for r in resultados]
             
             # Criar tabela de meses consecutivos
-            df_meses_consecutivos = df_pandas_presenca[['aeroporto', 'aeronave', 'meses_consecutivos_maximo', 'meses_consecutivos_minimo', 'meses_consecutivos_medio']].copy()
+            df_meses_consecutivos = df_pandas_presenca[['aeroporto', 'aeronave', 'meses_consecutivos_maximo', 'meses_consecutivos_minimo', 'meses_consecutivos_medio', 'meses_sem_operacao_maximo', 'meses_sem_operacao_minimo', 'meses_sem_operacao_medio']].copy()
             
             # Filtrar apenas combinações que tiveram pelo menos 1 mês de movimento
             df_meses_consecutivos = df_meses_consecutivos[df_meses_consecutivos['meses_consecutivos_maximo'] > 0]
@@ -2650,6 +2682,24 @@ with tab3:
                         "meses_consecutivos_medio": st.column_config.NumberColumn(
                             "Meses Consecutivos Médio",
                             help="Média de meses consecutivos com movimentação",
+                            width="medium",
+                            format="%.1f"
+                        ),
+                        "meses_sem_operacao_maximo": st.column_config.NumberColumn(
+                            "Meses Sem Operação Máximo",
+                            help="Máximo de meses consecutivos sem operação",
+                            width="medium",
+                            format="%d"
+                        ),
+                        "meses_sem_operacao_minimo": st.column_config.NumberColumn(
+                            "Meses Sem Operação Mínimo",
+                            help="Mínimo de meses consecutivos sem operação",
+                            width="medium",
+                            format="%d"
+                        ),
+                        "meses_sem_operacao_medio": st.column_config.NumberColumn(
+                            "Meses Sem Operação Médio",
+                            help="Média de meses consecutivos sem operação",
                             width="medium",
                             format="%.1f"
                         )
