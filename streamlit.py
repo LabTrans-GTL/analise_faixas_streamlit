@@ -2225,10 +2225,8 @@ with tab3:
             if "filtro_aeroportos_presenca" not in st.session_state:
                 st.session_state["filtro_aeroportos_presenca"] = aeroportos_disponiveis
             
-            # Garantir que o session_state contém apenas valores válidos
+            # Garantir que o session_state contém apenas valores válidos (permitir lista vazia)
             valores_validos = [a for a in st.session_state["filtro_aeroportos_presenca"] if a in aeroportos_disponiveis]
-            if not valores_validos:
-                valores_validos = aeroportos_disponiveis
             st.session_state["filtro_aeroportos_presenca"] = valores_validos
             
             # Botão para selecionar todos os aeroportos
@@ -2245,7 +2243,7 @@ with tab3:
                 "🏢 **Filtrar por Aeroportos:**",
                 options=aeroportos_disponiveis,
                 default=st.session_state["filtro_aeroportos_presenca"],
-                help="Selecione os aeroportos para incluir na análise. Se nenhum for selecionado, todos serão incluídos.",
+                help="Selecione os aeroportos para incluir na análise. Se nenhum for selecionado, nenhum resultado será mostrado.",
                 key="filtro_aeroportos_presenca"
             )
         
@@ -2257,10 +2255,8 @@ with tab3:
             if "filtro_aeronaves_presenca" not in st.session_state:
                 st.session_state["filtro_aeronaves_presenca"] = aeronaves_disponiveis
             
-            # Garantir que o session_state contém apenas valores válidos
+            # Garantir que o session_state contém apenas valores válidos (permitir lista vazia)
             valores_validos_aeronaves = [a for a in st.session_state["filtro_aeronaves_presenca"] if a in aeronaves_disponiveis]
-            if not valores_validos_aeronaves:
-                valores_validos_aeronaves = aeronaves_disponiveis
             st.session_state["filtro_aeronaves_presenca"] = valores_validos_aeronaves
             
             # Botão para selecionar todas as aeronaves
@@ -2277,16 +2273,11 @@ with tab3:
                 "✈️ **Filtrar por Aeronaves:**",
                 options=aeronaves_disponiveis,
                 default=st.session_state["filtro_aeronaves_presenca"],
-                help="Selecione as aeronaves para incluir na análise. Se nenhuma for selecionada, todas serão incluídas.",
+                help="Selecione as aeronaves para incluir na análise. Se nenhuma for selecionada, nenhum resultado será mostrado.",
                 key="filtro_aeronaves_presenca"
             )
         
-        # Aplicar filtros
-        if not aeroportos_selecionados:
-            aeroportos_selecionados = aeroportos_disponiveis
-        if not aeronaves_selecionadas:
-            aeronaves_selecionadas = aeronaves_disponiveis
-        
+        # Aplicar filtros (permitir seleção vazia para mostrar nenhum resultado)
         # Filtrar dados pelos seletores
         df_presenca_filtrado = df_presenca.filter(
             (pl.col("aeroporto").is_in(aeroportos_selecionados)) &
@@ -2295,7 +2286,14 @@ with tab3:
         
         # Mostrar informações sobre os filtros aplicados
         if len(aeroportos_selecionados) < len(aeroportos_disponiveis) or len(aeronaves_selecionadas) < len(aeronaves_disponiveis):
-            st.info(f"🔍 **Filtros ativos:** {len(aeroportos_selecionados)} aeroportos, {len(aeronaves_selecionadas)} aeronaves")
+            if len(aeroportos_selecionados) == 0 and len(aeronaves_selecionadas) == 0:
+                st.info("🔍 **Filtros ativos:** Nenhum aeroporto e nenhuma aeronave selecionados")
+            elif len(aeroportos_selecionados) == 0:
+                st.info(f"🔍 **Filtros ativos:** Nenhum aeroporto selecionado, {len(aeronaves_selecionadas)} aeronaves")
+            elif len(aeronaves_selecionadas) == 0:
+                st.info(f"🔍 **Filtros ativos:** {len(aeroportos_selecionados)} aeroportos, nenhuma aeronave selecionada")
+            else:
+                st.info(f"🔍 **Filtros ativos:** {len(aeroportos_selecionados)} aeroportos, {len(aeronaves_selecionadas)} aeronaves")
         
         # Verificar se há dados após filtros
         if df_presenca_filtrado.height == 0:
