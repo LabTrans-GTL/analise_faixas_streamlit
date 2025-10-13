@@ -301,7 +301,7 @@ with st.expander("ℹ️ **Sobre esta Aplicação**", expanded=False):
     - 🔢 **Filtros de Meses Consecutivos**: Filtre por operadores (maior que, menor que, igual a, etc.) com valores personalizados.
     - 📊 **Gráfico de Presença**: Visualize presença de movimentos (0/1) ao longo do tempo para cada combinação aeroporto-aeronave.
     - 🎯 **Exclusão Automática**: Remove automaticamente combinações sem movimento para análise mais focada.
-
+    
     **💡 Dicas de Uso:**
     - Navegue entre as três abas para diferentes perspectivas de análise.
     - Na configuração de faixas, use os sliders para ajustes rápidos e os campos numéricos para valores precisos.
@@ -2752,8 +2752,78 @@ with tab3:
                     - **Dica:** Clique duas vezes em um aeroporto-aeronave na legenda para destacar apenas essa combinação. Clique duas vezes para voltar a ver todas as combinações.
                     - **Observação:** O gráfico mostra as combinações mostradas anteriormente na Tabela de Meses Consecutivos
                     """)
+                
+                # Nova tabela: Detalhamento de Movimentos e Passageiros por Período
+                st.markdown("---")
+                st.markdown("#### 📋 **Detalhamento de Movimentos e Passageiros por Período**")
+                st.markdown("Visualize a quantidade de movimentação (P + D) e passageiros (E + D) por mês-ano para as combinações aeroporto-aeronave selecionadas")
+                
+                # Preparar dados para a tabela de detalhamento
+                df_detalhamento = df_presenca_filtrado.select([
+                    "aeroporto", "aeronave", "periodo", 
+                    pl.col("quantidade_voos").alias("movimentos_p_d"),
+                    pl.col("pax").alias("passageiros_e_d")
+                ]).sort(["aeroporto", "aeronave", "periodo"])
+                
+                if df_detalhamento.height > 0:
+                    # Converter para pandas para exibição
+                    df_detalhamento_pandas = df_detalhamento.to_pandas()
+                    
+                    # Configurar colunas da tabela
+                    column_config_detalhamento = {
+                        "aeroporto": st.column_config.TextColumn(
+                            "Aeroporto",
+                            help="Código do aeroporto",
+                            width="medium"
+                        ),
+                        "aeronave": st.column_config.TextColumn(
+                            "Aeronave", 
+                            help="Código da aeronave",
+                            width="small"
+                        ),
+                        "periodo": st.column_config.TextColumn(
+                            "Período",
+                            help="Período no formato Ano-Mês",
+                            width="medium"
+                        ),
+                        "movimentos_p_d": st.column_config.NumberColumn(
+                            "Movimentos (P + D)",
+                            help="Quantidade de movimentos de pouso e decolagem",
+                            width="medium",
+                            format="%d"
+                        ),
+                        "passageiros_e_d": st.column_config.NumberColumn(
+                            "Passageiros (E + D)",
+                            help="Quantidade de passageiros embarcados e desembarcados",
+                            width="medium",
+                            format="%d"
+                        )
+                    }
+                    
+                    # Mostrar tabela
+                    st.dataframe(
+                        df_detalhamento_pandas,
+                        use_container_width=True,
+                        column_config=column_config_detalhamento,
+                        hide_index=True
+                    )
+                    
+                    # Estatísticas da tabela de detalhamento
+                    total_movimentos = df_detalhamento_pandas['movimentos_p_d'].sum()
+                    total_passageiros = df_detalhamento_pandas['passageiros_e_d'].sum()
+                    combinacoes_unicas = len(df_detalhamento_pandas[['aeroporto', 'aeronave']].drop_duplicates())
+                    periodos_unicos_detalhamento = len(df_detalhamento_pandas['periodo'].unique())
+                    
+                    st.info(f"""
+                    📊 **Estatísticas da Tabela de Detalhamento:**
+                    - **Total de movimentos (P + D):** {formatar_numero(total_movimentos)}
+                    - **Total de passageiros (E + D):** {formatar_numero(total_passageiros)}
+                    - **Combinações aeroporto-aeronave:** {combinacoes_unicas}
+                    - **Períodos únicos:** {periodos_unicos_detalhamento}
+                    - **Registros totais:** {len(df_detalhamento_pandas)}
+                    """)
                 else:
-                    st.warning("⚠️ **Nenhum dado disponível para o gráfico** com os filtros aplicados.")
+                    st.warning("⚠️ **Nenhum dado disponível para a tabela de detalhamento** com os filtros aplicados.")
                 
             else:
                 st.warning("⚠️ **Nenhuma combinação com movimentação encontrada.**")
