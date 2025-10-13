@@ -290,12 +290,30 @@ with st.expander("ℹ️ **Sobre esta Aplicação**", expanded=False):
     **Aba "Análise por Categoria":**
     - 📈 **Análise Cumulativa de Frota**: Visualize a participação de voos de cada categoria de aeronave à medida que o total de passageiros se acumula em um determinado ano.
     - 📋 **Dados Agregados**: Acesse uma tabela com o total de passageiros e movimentos para cada categoria de aeronave no ano selecionado.
-    
+    - 🔢 **Análise Multi-Ano**: Selecione múltiplos anos para análise agregada de categorias de aeronave.
+    - 📊 **Composição de Movimentos**: Visualize movimentos (P + D) e passageiros (E + D) por categoria com percentuais detalhados.
+    - 📋 **Tabelas Detalhadas**: Acesse dados detalhados de percentual de movimentos e passageiros por categoria.
+
+    **Aba "Tabela de Presença de Movimentos":**
+    - 📋 **Presença de Movimentos**: Visualize tabela com presença (Sim/Não) de movimentos por aeroporto, aeronave e período (mês-ano).
+    - 🔍 **Filtros Avançados**: Filtre por aeroportos e aeronaves específicos com botões "Selecionar Todos".
+    - 📅 **Análise de Meses Consecutivos**: Calcule máximo, mínimo e médio de meses consecutivos com movimentação.
+    - 🔢 **Filtros de Meses Consecutivos**: Filtre por operadores (maior que, menor que, igual a, etc.) com valores personalizados.
+    - 📊 **Gráfico de Presença**: Visualize presença de movimentos (0/1) ao longo do tempo para cada combinação aeroporto-aeronave.
+    - 🎯 **Exclusão Automática**: Remove automaticamente combinações sem movimento para análise mais focada.
+
+    **🚫 Filtros e Exclusões:**
+    - **Exclusão de Aeroportos**: Configure exclusões por ano específico na barra lateral.
+    - **Exclusão de Aeronave E110**: Automaticamente excluída de todas as análises.
+    - **Filtros Flexíveis**: Permita seleção vazia ou específica de aeroportos e aeronaves.
+
     **💡 Dicas de Uso:**
-    - Navegue entre as abas "Análise de Faixas" e "Análise por Categoria" para diferentes perspectivas.
+    - Navegue entre as três abas para diferentes perspectivas de análise.
     - Na configuração de faixas, use os sliders para ajustes rápidos e os campos numéricos para valores precisos.
     - Utilize os filtros na barra lateral para excluir aeroportos em anos específicos.
+    - Na "Tabela de Presença", use os botões "Selecionar Todos" para resetar filtros rapidamente.
     - Expanda as seções para análises mais detalhadas e visualização de tabelas de dados.
+    - Use o gráfico de presença para identificar padrões temporais de movimentação.
     """)
 
 st.markdown("---")
