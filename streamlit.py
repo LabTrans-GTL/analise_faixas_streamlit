@@ -1989,22 +1989,28 @@ with tab2:
 
             if df_in_range.height > 0:
                 total_voos_threshold = df_in_range["quantidade_voos"].sum()
+                total_passageiros_threshold = df_in_range["pax"].sum()
                 if total_voos_threshold > 0:
                     voos_por_categoria = (
                         df_in_range
                         .group_by("categoria_aeronave")
-                        .agg(pl.sum("quantidade_voos").alias("voos_categoria"))
+                        .agg([
+                            pl.sum("quantidade_voos").alias("voos_categoria"),
+                            pl.sum("pax").alias("passageiros_categoria")
+                        ])
                     )
                     
                     # Join com todas as categorias para garantir que todas estejam presentes, preencher nulos com 0
-                    df_full_cat = all_categories_df.join(voos_por_categoria, on="categoria_aeronave", how="left").with_columns(
-                        pl.col("voos_categoria").fill_null(0)
-                    )
+                    df_full_cat = all_categories_df.join(voos_por_categoria, on="categoria_aeronave", how="left").with_columns([
+                        pl.col("voos_categoria").fill_null(0),
+                        pl.col("passageiros_categoria").fill_null(0)
+                    ])
 
-                    df_threshold_results = df_full_cat.with_columns(
+                    df_threshold_results = df_full_cat.with_columns([
                         (pl.col("voos_categoria") / total_voos_threshold * 100).alias("percentual_voos"),
+                        (pl.col("passageiros_categoria") / total_passageiros_threshold * 100).alias("percentual_passageiros"),
                         pl.lit(upper_bound).cast(pl.Float64).alias("limite_passageiros")
-                    )
+                    ])
                     
                     results_data.append(df_threshold_results)
 
@@ -2134,12 +2140,16 @@ with tab2:
                         df_details_pd = details['data'].select(
                             pl.col("categoria_aeronave").alias("Categoria"),
                             pl.col("voos_categoria").alias("Movimentos (P + D)"),
-                            pl.col("percentual_voos").alias("Percentual (%)")
+                            pl.col("percentual_voos").alias("Percentual (%)"),
+                            pl.col("passageiros_categoria").alias("Passageiros (E + D)"),
+                            pl.col("percentual_passageiros").alias("Percentual Passageiros (%)")
                         ).to_pandas()
 
                         # Formatar números
                         df_details_pd['Movimentos (P + D)'] = df_details_pd['Movimentos (P + D)'].apply(formatar_numero)
                         df_details_pd['Percentual (%)'] = df_details_pd['Percentual (%)'].apply(lambda x: f"{x:.2f}%")
+                        df_details_pd['Passageiros (E + D)'] = df_details_pd['Passageiros (E + D)'].apply(formatar_numero)
+                        df_details_pd['Percentual Passageiros (%)'] = df_details_pd['Percentual Passageiros (%)'].apply(lambda x: f"{x:.2f}%")
                         
                         st.dataframe(df_details_pd, use_container_width=True, hide_index=True)
 
