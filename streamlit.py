@@ -2325,6 +2325,15 @@ with tab3:
             # Remover coluna auxiliar
             df_final_presenca = df_final_presenca.drop("periodos_com_movimento")
             
+            # Filtrar linhas que têm pelo menos um "Sim" (remover linhas com todos "Não")
+            # Criar condição: pelo menos uma coluna de período deve ser "Sim"
+            condicao_tem_movimento = pl.lit(False)
+            for periodo in periodos_unicos:
+                condicao_tem_movimento = condicao_tem_movimento | (pl.col(periodo) == "Sim")
+            
+            # Aplicar filtro para manter apenas linhas com pelo menos um movimento
+            df_final_presenca = df_final_presenca.filter(condicao_tem_movimento)
+            
             # Ordenar por aeroporto e aeronave
             df_final_presenca = df_final_presenca.sort(["aeroporto", "aeronave"])
         
@@ -2335,6 +2344,8 @@ with tab3:
             - **Total de aeronaves:** {len(aeronaves_unicas)}
             - **Períodos analisados:** {len(periodos_unicos)} ({periodos_unicos[0]} a {periodos_unicos[-1]})
             - **Total de combinações:** {len(combinacoes)}
+            - **Combinações com movimento:** {df_final_presenca.height}
+            - **Combinações sem movimento:** {len(combinacoes) - df_final_presenca.height}
             """)
             
             # Mostrar a tabela
