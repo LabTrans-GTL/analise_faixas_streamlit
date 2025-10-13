@@ -2639,6 +2639,94 @@ with tab3:
                         hide_index=True
                     )
                 
+                # Gráfico de Presença de Movimentos
+                st.markdown("---")
+                st.markdown("#### 📊 **Gráfico de Presença de Movimentos**")
+                st.markdown("Visualize a presença de movimentos (0 = Não, 1 = Sim) ao longo do tempo para cada combinação aeroporto-aeronave")
+                
+                # Preparar dados para o gráfico
+                # Criar DataFrame com dados de presença para as combinações filtradas
+                df_grafico = df_pandas_presenca[df_pandas_presenca[['aeroporto', 'aeronave']].apply(
+                    lambda row: f"{row['aeroporto']}-{row['aeronave']}" in 
+                    df_meses_filtrado[['aeroporto', 'aeronave']].apply(
+                        lambda x: f"{x['aeroporto']}-{x['aeronave']}", axis=1
+                    ).values, axis=1
+                )].copy()
+                
+                if len(df_grafico) > 0:
+                    # Criar dados longos para o gráfico
+                    df_grafico_long = df_grafico.melt(
+                        id_vars=['aeroporto', 'aeronave'],
+                        value_vars=periodos_unicos,
+                        var_name='periodo',
+                        value_name='presenca'
+                    )
+                    
+                    # Converter "Sim"/"Não" para 1/0
+                    df_grafico_long['valor_presenca'] = df_grafico_long['presenca'].map({'Sim': 1, 'Não': 0})
+                    
+                    # Criar coluna de combinação aeroporto-aeronave para legenda
+                    df_grafico_long['combinacao'] = df_grafico_long['aeroporto'] + '-' + df_grafico_long['aeronave']
+                    
+                    # Criar gráfico
+                    import plotly.express as px
+                    import plotly.graph_objects as go
+                    
+                    # Criar gráfico de linha
+                    fig = px.line(
+                        df_grafico_long,
+                        x='periodo',
+                        y='valor_presenca',
+                        color='combinacao',
+                        title='Presença de Movimentos por Período',
+                        labels={
+                            'periodo': 'Período (Mês-Ano)',
+                            'valor_presenca': 'Presença de Movimento',
+                            'combinacao': 'Aeroporto-Aeronave'
+                        },
+                        height=600
+                    )
+                    
+                    # Personalizar o gráfico
+                    fig.update_layout(
+                        yaxis=dict(
+                            tickmode='array',
+                            tickvals=[0, 1],
+                            ticktext=['Não', 'Sim'],
+                            range=[-0.1, 1.1]
+                        ),
+                        xaxis=dict(
+                            tickangle=45
+                        ),
+                        legend=dict(
+                            orientation="v",
+                            yanchor="top",
+                            y=1,
+                            xanchor="left",
+                            x=1.02
+                        ),
+                        hovermode='x unified'
+                    )
+                    
+                    # Adicionar pontos para melhor visualização
+                    fig.update_traces(
+                        mode='lines+markers',
+                        marker=dict(size=4),
+                        line=dict(width=2)
+                    )
+                    
+                    # Mostrar gráfico
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Informações sobre o gráfico
+                    st.info(f"""
+                    📊 **Informações do Gráfico:**
+                    - **Combinações mostradas:** {len(df_grafico_long['combinacao'].unique())}
+                    - **Períodos analisados:** {len(periodos_unicos)}
+                    - **Valores:** 0 = Sem movimento, 1 = Com movimento
+                    """)
+                else:
+                    st.warning("⚠️ **Nenhum dado disponível para o gráfico** com os filtros aplicados.")
                 
             else:
                 st.warning("⚠️ **Nenhuma combinação com movimentação encontrada.**")
