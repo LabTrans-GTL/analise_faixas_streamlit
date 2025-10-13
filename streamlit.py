@@ -2140,14 +2140,14 @@ with tab2:
                         df_details_pd = details['data'].select(
                             pl.col("categoria_aeronave").alias("Categoria"),
                             pl.col("voos_categoria").alias("Movimentos (P + D)"),
-                            pl.col("percentual_voos").alias("Percentual (%)"),
+                            pl.col("percentual_voos").alias("Percentual Movimentos (%)"),
                             pl.col("passageiros_categoria").alias("Passageiros (E + D)"),
                             pl.col("percentual_passageiros").alias("Percentual Passageiros (%)")
                         ).to_pandas()
 
                         # Formatar números
                         df_details_pd['Movimentos (P + D)'] = df_details_pd['Movimentos (P + D)'].apply(formatar_numero)
-                        df_details_pd['Percentual (%)'] = df_details_pd['Percentual (%)'].apply(lambda x: f"{x:.2f}%")
+                        df_details_pd['Percentual Movimentos (%)'] = df_details_pd['Percentual Movimentos (%)'].apply(lambda x: f"{x:.2f}%")
                         df_details_pd['Passageiros (E + D)'] = df_details_pd['Passageiros (E + D)'].apply(formatar_numero)
                         df_details_pd['Percentual Passageiros (%)'] = df_details_pd['Percentual Passageiros (%)'].apply(lambda x: f"{x:.2f}%")
                         
@@ -2160,7 +2160,7 @@ with tab2:
 
             # Tabela de dados detalhados
             st.markdown("---")
-            st.markdown("#### 📋 **Dados Detalhados (Percentual de Participação %)**")
+            st.markdown("#### 📋 **Dados Detalhados (Percentual de Movimentos (P + D) %)")
             
             df_pivot_table = df_final.to_pandas().pivot(
                 index='categoria_aeronave',
@@ -2173,6 +2173,22 @@ with tab2:
                 df_pivot_table[col] = df_pivot_table[col].apply(lambda x: f'{x:.2f}%')
 
             st.dataframe(df_pivot_table)
+            
+            # Nova tabela de dados detalhados para passageiros
+            st.markdown("---")
+            st.markdown("#### 📋 **Dados Detalhados (Percentual de Passageiros (E + D) %)")
+            
+            df_pivot_table_passageiros = df_final.to_pandas().pivot(
+                index='categoria_aeronave',
+                columns='limite_passageiros',
+                values='percentual_passageiros'
+            ).fillna(0)
+
+            # Format columns
+            for col in df_pivot_table_passageiros.columns:
+                df_pivot_table_passageiros[col] = df_pivot_table_passageiros[col].apply(lambda x: f'{x:.2f}%')
+
+            st.dataframe(df_pivot_table_passageiros)
 
         else:
             anos_str = ", ".join(map(str, sorted(anos_selecionados_categoria)))
