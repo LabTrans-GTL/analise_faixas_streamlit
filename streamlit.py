@@ -302,11 +302,6 @@ with st.expander("ℹ️ **Sobre esta Aplicação**", expanded=False):
     - 📊 **Gráfico de Presença**: Visualize presença de movimentos (0/1) ao longo do tempo para cada combinação aeroporto-aeronave.
     - 🎯 **Exclusão Automática**: Remove automaticamente combinações sem movimento para análise mais focada.
 
-    **🚫 Filtros e Exclusões:**
-    - **Exclusão de Aeroportos**: Configure exclusões por ano específico na barra lateral.
-    - **Exclusão de Aeronave E110**: Automaticamente excluída de todas as análises.
-    - **Filtros Flexíveis**: Permita seleção vazia ou específica de aeroportos e aeronaves.
-
     **💡 Dicas de Uso:**
     - Navegue entre as três abas para diferentes perspectivas de análise.
     - Na configuração de faixas, use os sliders para ajustes rápidos e os campos numéricos para valores precisos.
