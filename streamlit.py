@@ -2758,8 +2758,56 @@ with tab3:
                 st.markdown("#### 📋 **Detalhamento de Movimentos e Passageiros por Período**")
                 st.markdown("Visualize a quantidade de movimentação (P + D) e passageiros (E + D) por mês-ano para as combinações aeroporto-aeronave selecionadas")
                 
+                # Filtros específicos para a tabela de detalhamento
+                st.markdown("##### 🔍 **Filtros para Detalhamento**")
+                
+                col_filtro_det1, col_filtro_det2 = st.columns(2)
+                
+                with col_filtro_det1:
+                    # Filtro por aeroporto específico
+                    aeroportos_detalhamento = sorted(df_presenca_filtrado["aeroporto"].unique().to_list())
+                    aeroporto_detalhamento = st.selectbox(
+                        "🏢 **Selecionar Aeroporto:**",
+                        options=["Todos"] + aeroportos_detalhamento,
+                        help="Selecione um aeroporto específico ou 'Todos' para ver todos os aeroportos",
+                        key="aeroporto_detalhamento"
+                    )
+                
+                with col_filtro_det2:
+                    # Filtro por aeronave específica
+                    aeronaves_detalhamento = sorted(df_presenca_filtrado["aeronave"].unique().to_list())
+                    aeronave_detalhamento = st.selectbox(
+                        "✈️ **Selecionar Aeronave:**",
+                        options=["Todos"] + aeronaves_detalhamento,
+                        help="Selecione uma aeronave específica ou 'Todos' para ver todas as aeronaves",
+                        key="aeronave_detalhamento"
+                    )
+                
+                # Aplicar filtros específicos
+                df_detalhamento_filtrado = df_presenca_filtrado
+                
+                if aeroporto_detalhamento != "Todos":
+                    df_detalhamento_filtrado = df_detalhamento_filtrado.filter(
+                        pl.col("aeroporto") == aeroporto_detalhamento
+                    )
+                
+                if aeronave_detalhamento != "Todos":
+                    df_detalhamento_filtrado = df_detalhamento_filtrado.filter(
+                        pl.col("aeronave") == aeronave_detalhamento
+                    )
+                
+                # Mostrar informações sobre os filtros aplicados
+                filtros_detalhamento = []
+                if aeroporto_detalhamento != "Todos":
+                    filtros_detalhamento.append(f"Aeroporto: {aeroporto_detalhamento}")
+                if aeronave_detalhamento != "Todos":
+                    filtros_detalhamento.append(f"Aeronave: {aeronave_detalhamento}")
+                
+                if filtros_detalhamento:
+                    st.info(f"🔍 **Filtros aplicados:** {' | '.join(filtros_detalhamento)}")
+                
                 # Preparar dados para a tabela de detalhamento
-                df_detalhamento = df_presenca_filtrado.select([
+                df_detalhamento = df_detalhamento_filtrado.select([
                     "aeroporto", "aeronave", "periodo", 
                     pl.col("quantidade_voos").alias("movimentos_p_d"),
                     pl.col("pax").alias("passageiros_e_d")
