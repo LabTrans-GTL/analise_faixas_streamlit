@@ -2934,27 +2934,34 @@ with tab3:
                 col_filtro_det1, col_filtro_det2 = st.columns(2)
                 
                 with col_filtro_det1:
-                    # Filtro por aeroporto específico
-                    aeroportos_detalhamento = sorted(df_presenca_filtrado["aeroporto"].unique().to_list())
+                    # Filtro por aeroporto específico - apenas aeroportos presentes no gráfico
+                    aeroportos_detalhamento = sorted(df_meses_filtrado["aeroporto"].unique().tolist())
                     aeroporto_detalhamento = st.selectbox(
                         "🏢 **Selecionar Aeroporto:**",
                         options=["Todos"] + aeroportos_detalhamento,
-                        help="Selecione um aeroporto específico ou 'Todos' para ver todos os aeroportos",
+                        help="Selecione um aeroporto específico ou 'Todos' para ver todos os aeroportos presentes no Gráfico de Presença de Movimentos",
                         key="aeroporto_detalhamento"
                     )
                 
                 with col_filtro_det2:
-                    # Filtro por aeronave específica
-                    aeronaves_detalhamento = sorted(df_presenca_filtrado["aeronave"].unique().to_list())
+                    # Filtro por aeronave específica - apenas aeronaves presentes no gráfico
+                    aeronaves_detalhamento = sorted(df_meses_filtrado["aeronave"].unique().tolist())
                     aeronave_detalhamento = st.selectbox(
                         "✈️ **Selecionar Aeronave:**",
                         options=["Todos"] + aeronaves_detalhamento,
-                        help="Selecione uma aeronave específica ou 'Todos' para ver todas as aeronaves",
+                        help="Selecione uma aeronave específica ou 'Todos' para ver todas as aeronaves presentes no Gráfico de Presença de Movimentos",
                         key="aeronave_detalhamento"
                     )
                 
-                # Aplicar filtros específicos
-                df_detalhamento_filtrado = df_presenca_filtrado
+                # Aplicar filtros específicos - usar apenas combinações presentes no gráfico
+                # Primeiro, filtrar apenas as combinações que estão no df_meses_filtrado
+                combinacoes_grafico = df_meses_filtrado[['aeroporto', 'aeronave']].apply(
+                    lambda x: f"{x['aeroporto']}-{x['aeronave']}", axis=1
+                ).tolist()
+                
+                df_detalhamento_filtrado = df_presenca_filtrado.filter(
+                    pl.concat_str([pl.col("aeroporto"), pl.lit("-"), pl.col("aeronave")]).is_in(combinacoes_grafico)
+                )
                 
                 if aeroporto_detalhamento != "Todos":
                     df_detalhamento_filtrado = df_detalhamento_filtrado.filter(
