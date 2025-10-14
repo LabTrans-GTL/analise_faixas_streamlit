@@ -2246,7 +2246,8 @@ with tab3:
         # Função para ordenar períodos cronologicamente
         def ordenar_periodos_cronologicamente_presenca(periodos):
             def chave_ordenacao(periodo):
-                ano, mes = periodo.split("-M")
+                # Formato: "2022-01" (ano-mes com zero à esquerda)
+                ano, mes = periodo.split("-")
                 return (int(ano), int(mes))
             return sorted(periodos, key=chave_ordenacao)
         
