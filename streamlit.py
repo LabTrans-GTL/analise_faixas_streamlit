@@ -1309,8 +1309,17 @@ with tab1:
                         )
                     
                     with col_detalhe2:
-                        # Seletor de período para detalhamento
-                        periodos_disponiveis = sorted(df_grafico_voos["periodo"].unique().to_list())
+                        # Seletor de período para detalhamento - ordenar cronologicamente
+                        periodos_unicos = df_grafico_voos["periodo"].unique().to_list()
+                        
+                        # Função para ordenar períodos cronologicamente
+                        def ordenar_periodos_cronologicamente(periodos):
+                            def chave_ordenacao(periodo):
+                                ano, mes = periodo.split("-M")
+                                return (int(ano), int(mes))
+                            return sorted(periodos, key=chave_ordenacao)
+                        
+                        periodos_disponiveis = ordenar_periodos_cronologicamente(periodos_unicos)
                         periodo_selecionado_detalhe = st.selectbox(
                             "📅 **Selecione o Período:**",
                             options=periodos_disponiveis,
@@ -1768,8 +1777,17 @@ with tab1:
                         )
                     
                     with col_detalhe_perc2:
-                        # Seletor de período para detalhamento
-                        periodos_disponiveis_perc = sorted(df_grafico_perc["periodo"].unique().to_list())
+                        # Seletor de período para detalhamento - ordenar cronologicamente
+                        periodos_unicos_perc = df_grafico_perc["periodo"].unique().to_list()
+                        
+                        # Função para ordenar períodos cronologicamente
+                        def ordenar_periodos_cronologicamente_perc(periodos):
+                            def chave_ordenacao(periodo):
+                                ano, mes = periodo.split("-M")
+                                return (int(ano), int(mes))
+                            return sorted(periodos, key=chave_ordenacao)
+                        
+                        periodos_disponiveis_perc = ordenar_periodos_cronologicamente_perc(periodos_unicos_perc)
                         periodo_selecionado_detalhe_perc = st.selectbox(
                             "📅 **Selecione o Período:**",
                             options=periodos_disponiveis_perc,
@@ -2222,8 +2240,17 @@ with tab3:
             (pl.col("ano").cast(pl.Utf8) + "-" + pl.col("mes").cast(pl.Utf8).str.zfill(2)).alias("periodo")
         ])
         
-        # Obter períodos únicos e ordená-los
-        periodos_unicos = sorted(df_presenca["periodo"].unique().to_list())
+        # Obter períodos únicos e ordená-los cronologicamente
+        periodos_unicos_raw = df_presenca["periodo"].unique().to_list()
+        
+        # Função para ordenar períodos cronologicamente
+        def ordenar_periodos_cronologicamente_presenca(periodos):
+            def chave_ordenacao(periodo):
+                ano, mes = periodo.split("-M")
+                return (int(ano), int(mes))
+            return sorted(periodos, key=chave_ordenacao)
+        
+        periodos_unicos = ordenar_periodos_cronologicamente_presenca(periodos_unicos_raw)
         
         # Filtros por aeroporto e aeronave
         st.markdown("#### 🔍 **Filtros**")
