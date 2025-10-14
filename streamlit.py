@@ -2599,7 +2599,7 @@ with tab3:
                     )
                 
                 # Seção 2: Filtros para Meses Sem Operação
-                st.markdown("---")
+                
                 st.markdown("#### 🔍 **Filtros para Meses Sem Operação**")
                 
                 # Criar 3 colunas para os filtros de meses sem operação
