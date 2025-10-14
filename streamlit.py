@@ -2651,7 +2651,7 @@ with tab3:
                         "🔢 **Valor:**",
                         min_value=0,
                         max_value=max_valor_sem_max,
-                        value=1,
+                        value=0,
                         help=f"Digite o valor para comparação (0 a {max_valor_sem_max})",
                         key="valor_filtro_sem_maximo"
                     )
@@ -2674,7 +2674,7 @@ with tab3:
                         "🔢 **Valor:**",
                         min_value=0,
                         max_value=max_valor_sem_min,
-                        value=1,
+                        value=0,
                         help=f"Digite o valor para comparação (0 a {max_valor_sem_min})",
                         key="valor_filtro_sem_minimo"
                     )
@@ -2697,7 +2697,7 @@ with tab3:
                         "🔢 **Valor:**",
                         min_value=0.0,
                         max_value=max_valor_sem_med,
-                        value=1.0,
+                        value=0.0,
                         step=0.1,
                         help=f"Digite o valor para comparação (0.0 a {max_valor_sem_med:.1f})",
                         key="valor_filtro_sem_medio"
