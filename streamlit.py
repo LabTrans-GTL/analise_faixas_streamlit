@@ -179,7 +179,7 @@ aeroportos_padrao_exclusao = [
     'SBGV', 'SBIL', 'SBJV', 'SBKG', 'SBME', 'SBML', 'SBPB', 'SBPP', 'SBRJ', 
     'SBRP', 'SBSM', 'SBSP', 'SBSR', 'SBTC', 'SBTE', 'SBUA', 'SBUG', 'SBUR', 
     'SBUY', 'SIRI', 'SISO', 'SNCL', 'SNRJ', 'SNTI', 'SSCT', 'SSUV', 'SWCA', 
-    'SBJR', 'SBMI', 'SBCO', 'SBSJ'
+    'SBJR', 'SBMI', 'SBCO', 'SBSJ', 'SBIP'
 ]
 
 # Botão para selecionar os padrões
